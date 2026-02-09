@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  token_hash: MyString
+  owner: one
+  owner_type: Owner
+  expires_at: 2026-02-09 15:26:13
+  revoked_at: 2026-02-09 15:26:13
+  last_used_at: 2026-02-09 15:26:13
+
+two:
+  token_hash: MyString
+  owner: two
+  owner_type: Owner
+  expires_at: 2026-02-09 15:26:13
+  revoked_at: 2026-02-09 15:26:13
+  last_used_at: 2026-02-09 15:26:13

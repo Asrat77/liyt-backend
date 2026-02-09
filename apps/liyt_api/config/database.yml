@@ -23,6 +23,11 @@ default: &default
 development:
   <<: *default
   database: liyt_api_development
+  url: <%= ENV["LIYT_DATABASE_URL"] %>
+  username: <%= ENV.fetch("LIYT_DB_USER", ENV["USER"]) %>
+  password: <%= ENV["LIYT_DB_PASSWORD"] %>
+  host: <%= ENV.fetch("LIYT_DB_HOST", "127.0.0.1") %>
+  port: <%= ENV.fetch("LIYT_DB_PORT", 5432) %>
 
   # The specified database role being used to connect to PostgreSQL.
   # To create additional roles in PostgreSQL see `$ createuser --help`.
@@ -57,6 +62,11 @@ development:
 test:
   <<: *default
   database: liyt_api_test
+  url: <%= ENV["LIYT_DATABASE_URL"] %>
+  username: <%= ENV.fetch("LIYT_DB_USER", ENV["USER"]) %>
+  password: <%= ENV["LIYT_DB_PASSWORD"] %>
+  host: <%= ENV.fetch("LIYT_DB_HOST", "127.0.0.1") %>
+  port: <%= ENV.fetch("LIYT_DB_PORT", 5432) %>
 
 # As with config/credentials.yml, you never want to store sensitive information,
 # like your database password, in your source code. If your source code is
