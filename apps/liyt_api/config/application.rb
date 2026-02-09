@@ -32,6 +32,6 @@ module LiytApi
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
 
-    config.middleware.insert_before 0, "RequestIdMiddleware"
+    config.middleware.insert_before 0, RequestIdMiddleware
   end
 end
