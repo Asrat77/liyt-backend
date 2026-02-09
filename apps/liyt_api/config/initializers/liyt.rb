@@ -1,4 +1,4 @@
-require_relative "../../../infra/lib/infra"
+require_relative "../../../../infra/lib/infra"
 
 module Liyt
   class Configuration
