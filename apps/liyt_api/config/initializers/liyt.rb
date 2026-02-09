@@ -1,10 +1,5 @@
 require_relative "../../../../infra/lib/infra"
+require_relative "../../../../domains/configuration"
+require_relative "../../../../domains/delivery/registration"
 
-module Liyt
-  class Configuration
-    def call
-    end
-  end
-end
-
-Liyt::Configuration.new.call
+Liyt::Configuration.new(registrations: [ Delivery::Registration.new ]).call
