@@ -23,7 +23,7 @@ default: &default
 development:
   <<: *default
   database: liyt_api_development
-  url: <%= ENV["LIYT_DATABASE_URL"] %>
+  url: <%= ENV["LIYT_DATABASE_URL"] || ENV["DATABASE_URL"] %>
   username: <%= ENV.fetch("LIYT_DB_USER", ENV["USER"]) %>
   password: <%= ENV["LIYT_DB_PASSWORD"] %>
   host: <%= ENV.fetch("LIYT_DB_HOST", "127.0.0.1") %>
@@ -62,7 +62,7 @@ development:
 test:
   <<: *default
   database: liyt_api_test
-  url: <%= ENV["LIYT_DATABASE_URL"] %>
+  url: <%= ENV["LIYT_DATABASE_URL"] || ENV["DATABASE_URL"] %>
   username: <%= ENV.fetch("LIYT_DB_USER", ENV["USER"]) %>
   password: <%= ENV["LIYT_DB_PASSWORD"] %>
   host: <%= ENV.fetch("LIYT_DB_HOST", "127.0.0.1") %>

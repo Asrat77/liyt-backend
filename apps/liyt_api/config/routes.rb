@@ -10,6 +10,8 @@ Rails.application.routes.draw do
       post :refresh
       post :revoke
     end
+
+    resource :me, only: [ :show ]
   end
 
   # Defines the root path route ("/")

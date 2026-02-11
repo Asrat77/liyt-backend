@@ -38,11 +38,11 @@ module Auth
     private
 
     def build_tokens(user)
-      access_token = Infra::Jwt.encode(
+      access_token = Infra::Jwt.encode({
         "sub" => user.id,
         "biz" => user.business_id,
         "role" => user.roles.pluck(:name)
-      )
+      })
 
       refresh_raw = Infra::TokenGenerator.generate
       RefreshToken.create!(

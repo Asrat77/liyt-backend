@@ -2,12 +2,10 @@
 
 one:
   business: one
-  email: MyString
-  role: MyString
-  password_digest: MyString
+  email: admin@acme.test
+  password_digest: <%= BCrypt::Password.create("password") %>
 
 two:
   business: two
-  email: MyString
-  role: MyString
-  password_digest: MyString
+  email: staff@beta.test
+  password_digest: <%= BCrypt::Password.create("password") %>

@@ -1,17 +1,20 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  token_hash: MyString
+active:
+  token_hash: <%= Infra::TokenHashing.digest("token-active") %>
   owner: one
-  owner_type: Owner
-  expires_at: 2026-02-09 15:26:13
-  revoked_at: 2026-02-09 15:26:13
-  last_used_at: 2026-02-09 15:26:13
+  owner_type: User
+  expires_at: <%= 1.day.from_now %>
 
-two:
-  token_hash: MyString
-  owner: two
-  owner_type: Owner
-  expires_at: 2026-02-09 15:26:13
-  revoked_at: 2026-02-09 15:26:13
-  last_used_at: 2026-02-09 15:26:13
+expired:
+  token_hash: <%= Infra::TokenHashing.digest("token-expired") %>
+  owner: one
+  owner_type: User
+  expires_at: <%= 1.day.ago %>
+
+revoked:
+  token_hash: <%= Infra::TokenHashing.digest("token-revoked") %>
+  owner: one
+  owner_type: User
+  expires_at: <%= 1.day.from_now %>
+  revoked_at: <%= 1.hour.ago %>

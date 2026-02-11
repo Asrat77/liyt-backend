@@ -26,7 +26,7 @@ class ApplicationController < ActionController::API
     Current.actor = user
     Current.tenant = user.business
     Current.session = payload
-  rescue JWT::DecodeError
+  rescue JWT::DecodeError, ArgumentError
     head :unauthorized
   end
 end
