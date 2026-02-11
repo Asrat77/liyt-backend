@@ -2,7 +2,7 @@
 
 one:
   business: one
-  email: admin@acme.test
+  email: ADMIN@ACME.test
   password_digest: <%= BCrypt::Password.create("password") %>
 
 two:
