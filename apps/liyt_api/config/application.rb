@@ -1,5 +1,6 @@
 require_relative "boot"
 require_relative "../app/middleware/request_id_middleware"
+require_relative "../app/middleware/auth_rate_limit"
 
 require "rails/all"
 
@@ -38,5 +39,6 @@ module LiytApi
     config.api_only = true
 
     config.middleware.insert_before 0, RequestIdMiddleware
+    config.middleware.use AuthRateLimit
   end
 end

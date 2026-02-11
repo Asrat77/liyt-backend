@@ -5,12 +5,21 @@ active:
   owner: one
   owner_type: User
   expires_at: <%= 1.day.from_now %>
+  family: user-family
+
+driver_active:
+  token_hash: <%= Infra::TokenHashing.digest("token-driver") %>
+  owner: one
+  owner_type: Driver
+  expires_at: <%= 1.day.from_now %>
+  family: driver-family
 
 expired:
   token_hash: <%= Infra::TokenHashing.digest("token-expired") %>
   owner: one
   owner_type: User
   expires_at: <%= 1.day.ago %>
+  family: user-family
 
 revoked:
   token_hash: <%= Infra::TokenHashing.digest("token-revoked") %>
@@ -18,3 +27,4 @@ revoked:
   owner_type: User
   expires_at: <%= 1.day.from_now %>
   revoked_at: <%= 1.hour.ago %>
+  family: user-family

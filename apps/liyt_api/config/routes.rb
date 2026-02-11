@@ -11,6 +11,16 @@ Rails.application.routes.draw do
       post :revoke
     end
 
+    resource :registrations, only: [ :create ]
+    resource :me, only: [ :show ]
+  end
+
+  namespace :drivers do
+    resource :sessions, only: [ :create ] do
+      post :refresh
+      post :revoke
+    end
+    resource :registrations, only: [ :create ]
     resource :me, only: [ :show ]
   end
 
