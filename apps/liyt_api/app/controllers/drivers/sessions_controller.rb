@@ -1,14 +1,14 @@
-module Auth
+module Drivers
   class SessionsController < ApplicationController
     include TokenIssuer
 
     skip_before_action :authenticate_request, only: [ :create, :refresh, :revoke ]
 
     def create
-      user = User.find_by!(email: params[:email])
-      return head(:unauthorized) unless user.authenticate(params[:password])
+      driver = Driver.find_by!(email: params[:email])
+      return head(:unauthorized) unless driver.authenticate(params[:password])
 
-      render json: issue_tokens(user, user_payload(user)), status: :created
+      render json: issue_tokens(driver, driver_payload(driver)), status: :created
     rescue ActiveRecord::RecordNotFound
       head :unauthorized
     end
@@ -20,6 +20,7 @@ module Auth
       token_hash = Infra::TokenHashing.digest(token)
       refresh_token = RefreshToken.find_by(token_hash: token_hash)
       return head(:unauthorized) unless refresh_token
+      return head(:unauthorized) unless refresh_token.owner_type == "Driver"
 
       if refresh_token.revoked? || refresh_token.expired?
         refresh_token.revoke_family!
@@ -29,9 +30,9 @@ module Auth
       refresh_token.update!(last_used_at: Time.current, revoked_at: Time.current)
       render json: issue_tokens(
         refresh_token.owner,
-        user_payload(refresh_token.owner),
+        driver_payload(refresh_token.owner),
         family: refresh_token.family
-      ).merge(roles: refresh_token.owner.roles.pluck(:name))
+      )
     end
 
     def revoke
@@ -41,6 +42,7 @@ module Auth
       token_hash = Infra::TokenHashing.digest(token)
       refresh_token = RefreshToken.find_by(token_hash: token_hash)
       return head(:not_found) unless refresh_token
+      return head(:not_found) unless refresh_token.owner_type == "Driver"
 
       refresh_token.revoke_family!
       head :no_content

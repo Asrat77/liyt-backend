@@ -20,12 +20,21 @@ class ApplicationController < ActionController::API
     payload = Infra::Jwt.decode(token)
     return head(:unauthorized) if payload.nil?
 
-    user = User.find_by(id: payload["sub"], business_id: payload["biz"])
-    return head(:unauthorized) unless user
+    case payload["typ"]
+    when "driver"
+      driver = Driver.find_by(id: payload["sub"])
+      return head(:unauthorized) unless driver
 
-    Current.actor = user
-    Current.tenant = user.business
-    Current.session = payload
+      Current.driver = driver
+      Current.session = payload
+    else
+      user = User.find_by(id: payload["sub"], business_id: payload["biz"])
+      return head(:unauthorized) unless user
+
+      Current.actor = user
+      Current.tenant = user.business
+      Current.session = payload
+    end
   rescue JWT::DecodeError, ArgumentError
     head :unauthorized
   end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_09_122613) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_11_171000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -22,15 +22,25 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_09_122613) do
     t.index ["slug"], name: "index_businesses_on_slug", unique: true
   end
 
+  create_table "drivers", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "email", null: false
+    t.string "password_digest", null: false
+    t.datetime "updated_at", null: false
+    t.index "lower((email)::text)", name: "index_drivers_on_lower_email", unique: true
+  end
+
   create_table "refresh_tokens", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "expires_at", null: false
+    t.string "family", null: false
     t.datetime "last_used_at"
     t.bigint "owner_id", null: false
     t.string "owner_type", null: false
     t.datetime "revoked_at"
     t.string "token_hash", null: false
     t.datetime "updated_at", null: false
+    t.index ["owner_type", "owner_id", "family"], name: "index_refresh_tokens_on_owner_type_and_owner_id_and_family"
     t.index ["owner_type", "owner_id"], name: "index_refresh_tokens_on_owner"
     t.index ["owner_type", "owner_id"], name: "index_refresh_tokens_on_owner_type_and_owner_id"
     t.index ["token_hash"], name: "index_refresh_tokens_on_token_hash", unique: true
@@ -61,7 +71,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_09_122613) do
     t.string "email", null: false
     t.string "password_digest", null: false
     t.datetime "updated_at", null: false
-    t.index ["business_id", "email"], name: "index_users_on_business_id_and_email", unique: true
+    t.index "lower((email)::text)", name: "index_users_on_lower_email", unique: true
     t.index ["business_id"], name: "index_users_on_business_id"
   end
 

@@ -40,12 +40,14 @@ class Auth::SessionsControllerTest < ActionDispatch::IntegrationTest
     assert body["access_token"].present?
     assert body["refresh_token"].present?
     assert refresh_tokens(:active).reload.last_used_at.present?
+    assert refresh_tokens(:active).reload.revoked?
   end
 
   test "rejects refresh with expired token" do
     post refresh_auth_sessions_path, params: { refresh_token: "token-expired" }
 
     assert_response :unauthorized
+    assert refresh_tokens(:expired).reload.revoked?
   end
 
   test "revokes a refresh token" do
