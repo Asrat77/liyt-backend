@@ -3,7 +3,7 @@ module Auth
     skip_before_action :authenticate_request, only: [ :create, :refresh, :revoke ]
 
     def create
-      user = User.find_by!(business_id: params[:business_id], email: params[:email])
+      user = User.find_by!(email: params[:email])
       return head(:unauthorized) unless user.authenticate(params[:password])
 
       render json: build_tokens(user), status: :created

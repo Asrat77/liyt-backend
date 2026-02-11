@@ -20,6 +20,19 @@ class UserTest < ActiveSupport::TestCase
     assert_includes duplicate.errors[:email], "has already been taken"
   end
 
+  test "email is unique across businesses" do
+    other_business = businesses(:two)
+
+    duplicate = User.new(
+      business: other_business,
+      email: users(:one).email.upcase,
+      password: "password"
+    )
+
+    assert_not duplicate.valid?
+    assert_includes duplicate.errors[:email], "has already been taken"
+  end
+
   test "password authentication works" do
     user = users(:one)
 
