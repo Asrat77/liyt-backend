@@ -3,12 +3,11 @@ require "test_helper"
 class Auth::SessionsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @user = users(:one)
-    @business = businesses(:one)
   end
 
   test "creates a session with valid credentials" do
     post auth_sessions_path,
-      params: { business_id: @business.id, email: @user.email, password: "password" }
+      params: { email: @user.email, password: "password" }
 
     assert_response :created
     body = JSON.parse(response.body)
@@ -21,7 +20,7 @@ class Auth::SessionsControllerTest < ActionDispatch::IntegrationTest
 
   test "rejects invalid credentials" do
     post auth_sessions_path,
-      params: { business_id: @business.id, email: @user.email, password: "wrong" }
+      params: { email: @user.email, password: "wrong" }
 
     assert_response :unauthorized
   end
