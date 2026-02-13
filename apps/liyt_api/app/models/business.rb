@@ -7,6 +7,8 @@ class Business < ApplicationRecord
 
   validates :name, presence: true
   validates :slug, presence: true, uniqueness: true
+  validates :status, presence: true, inclusion: { in: %w[active suspended] }
+  validates :support_email, format: { with: URI::MailTo::EMAIL_REGEXP }, allow_nil: true
 
   private
 

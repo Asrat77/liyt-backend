@@ -3,7 +3,9 @@
 one:
   name: Acme Logistics
   slug: acme
+  status: active
 
 two:
   name: Beta Delivery
   slug: beta
+  status: active

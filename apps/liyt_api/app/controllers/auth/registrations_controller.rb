@@ -9,7 +9,7 @@ module Auth
       user = nil
 
       ApplicationRecord.transaction do
-        business = Business.create!(name: params[:business_name])
+        business = Business.create!(business_params)
 
         user = User.create!(
           business: business,
@@ -44,8 +44,16 @@ module Auth
       {
         id: business.id,
         name: business.name,
-        slug: business.slug
+        slug: business.slug,
+        status: business.status,
+        support_email: business.support_email
       }
+    end
+
+    def business_params
+      params.permit(:business_name, :support_email).tap do |attributes|
+        attributes[:name] = attributes.delete(:business_name)
+      end
     end
   end
 end
