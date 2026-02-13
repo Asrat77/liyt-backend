@@ -240,3 +240,7 @@ This document lists all routes defined in `apps/liyt_api/config/routes.rb`, with
   "last_location_at": null
 }
 ```
+
+## Business locations
+
+Business locations are stored for businesses but are not yet exposed via API routes.
