@@ -191,7 +191,7 @@ This document lists all routes defined in `apps/liyt_api/config/routes.rb`, with
   - Issue access and refresh tokens
 - Responses:
   - 201 Created: token response plus driver
-  - 422 Unprocessable Entity: invalid data or duplicate email
+  - 422 Unprocessable Entity: invalid data, duplicate email, or duplicate phone
 - Response body:
 ```json
 {
