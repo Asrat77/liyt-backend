@@ -24,6 +24,8 @@ Rails.application.routes.draw do
     resource :me, only: [ :show ]
   end
 
+  resources :business_locations, only: [ :index, :show, :create, :update, :destroy ]
+
   # Defines the root path route ("/")
   # root "posts#index"
 end
