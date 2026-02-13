@@ -10,9 +10,28 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_13_122505) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_13_163154) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "business_locations", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.string "address1"
+    t.string "address2"
+    t.bigint "business_id", null: false
+    t.string "city"
+    t.string "country_code", null: false
+    t.datetime "created_at", null: false
+    t.text "instructions"
+    t.decimal "latitude", precision: 10, scale: 8
+    t.decimal "longitude", precision: 11, scale: 8
+    t.string "name", null: false
+    t.string "postal_code"
+    t.string "region"
+    t.datetime "updated_at", null: false
+    t.index ["business_id", "active"], name: "index_business_locations_on_business_id_and_active"
+    t.index ["business_id"], name: "index_business_locations_on_business_id"
+  end
 
   create_table "businesses", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -90,6 +109,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_13_122505) do
     t.index ["business_id"], name: "index_users_on_business_id"
   end
 
+  add_foreign_key "business_locations", "businesses"
   add_foreign_key "roles", "businesses"
   add_foreign_key "user_roles", "roles"
   add_foreign_key "user_roles", "users"
