@@ -240,3 +240,83 @@ This document lists all routes defined in `apps/liyt_api/config/routes.rb`, with
   "last_location_at": null
 }
 ```
+
+## Business locations
+
+### GET /business_locations
+
+- Controller: `BusinessLocationsController#index`
+- Auth: required (user token)
+- Responses:
+  - 200 OK: list of business locations for the current tenant
+
+### GET /business_locations/:id
+
+- Controller: `BusinessLocationsController#show`
+- Auth: required (user token)
+- Responses:
+  - 200 OK: business location
+  - 404 Not Found: location not in tenant
+
+### POST /business_locations
+
+- Controller: `BusinessLocationsController#create`
+- Auth: required (admin only)
+- Body:
+  - `name` (string, required)
+  - `country_code` (string, required)
+  - `address1` (string, optional)
+  - `address2` (string, optional)
+  - `city` (string, optional)
+  - `region` (string, optional)
+  - `postal_code` (string, optional)
+  - `latitude` (decimal, optional)
+  - `longitude` (decimal, optional)
+  - `instructions` (string, optional)
+  - `active` (boolean, optional; default true)
+- Responses:
+  - 201 Created: business location
+  - 403 Forbidden: non-admin user
+  - 422 Unprocessable Entity: invalid data
+
+### PATCH /business_locations/:id
+
+- Controller: `BusinessLocationsController#update`
+- Auth: required (admin only)
+- Body: any field from create
+- Responses:
+  - 200 OK: business location
+  - 403 Forbidden: non-admin user
+  - 404 Not Found: location not in tenant
+  - 422 Unprocessable Entity: invalid data
+
+### DELETE /business_locations/:id
+
+- Controller: `BusinessLocationsController#destroy`
+- Auth: required (admin only)
+- Responses:
+  - 204 No Content: deleted
+  - 403 Forbidden: non-admin user
+  - 404 Not Found: location not in tenant
+
+### Business location response
+
+```json
+{
+  "id": 1,
+  "business_id": 1,
+  "name": "Warehouse One",
+  "address1": "100 Main St",
+  "address2": null,
+  "city": "Portland",
+  "region": "OR",
+  "postal_code": "97204",
+  "country_code": "US",
+  "latitude": "45.5152",
+  "longitude": "-122.6784",
+  "instructions": "Dock 3",
+  "active": true,
+  "created_at": "2026-02-13T16:31:54Z",
+  "updated_at": "2026-02-13T16:31:54Z"
+}
+```

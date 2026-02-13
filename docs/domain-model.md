@@ -4,6 +4,7 @@ Tenant boundary
 
 - `Business` is the tenant root.
 - Business-only data is always scoped by `business_id`.
+- `BusinessLocation` stores physical sites for a business (addresses, instructions, geo).
 
 Global actors
 

@@ -1,0 +1,25 @@
+one:
+  business: one
+  name: Warehouse One
+  address1: 100 Main St
+  city: Portland
+  region: OR
+  postal_code: 97204
+  country_code: US
+  latitude: 45.5152
+  longitude: -122.6784
+  instructions: Dock 3
+  active: true
+
+two:
+  business: two
+  name: Depot East
+  address1: 200 Market St
+  city: Seattle
+  region: WA
+  postal_code: 98101
+  country_code: US
+  latitude: 47.6062
+  longitude: -122.3321
+  instructions: Loading bay
+  active: false
