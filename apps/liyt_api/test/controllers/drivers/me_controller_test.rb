@@ -14,6 +14,8 @@ class Drivers::MeControllerTest < ActionDispatch::IntegrationTest
 
     assert_equal @driver.id, body["id"]
     assert_equal @driver.email, body["email"]
+    assert_equal @driver.phone, body["phone"]
+    assert_equal "active", body["status"]
   end
 
   test "rejects access without token" do
