@@ -38,7 +38,7 @@ class BusinessLocationsController < ApplicationController
   private
 
   def ensure_current_tenant
-    head :unauthorized unless Current.tenant
+    head(:unauthorized) unless Current.tenant
   end
 
   def set_business_location
