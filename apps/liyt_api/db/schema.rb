@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_11_171000) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_13_122505) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -18,16 +18,31 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_11_171000) do
     t.datetime "created_at", null: false
     t.string "name", null: false
     t.string "slug", null: false
+    t.string "status", default: "active", null: false
+    t.string "support_email"
     t.datetime "updated_at", null: false
     t.index ["slug"], name: "index_businesses_on_slug", unique: true
+    t.index ["status"], name: "index_businesses_on_status"
   end
 
   create_table "drivers", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email", null: false
+    t.string "full_name"
+    t.decimal "last_latitude", precision: 10, scale: 8
+    t.datetime "last_location_at"
+    t.decimal "last_longitude", precision: 11, scale: 8
+    t.string "license_number"
     t.string "password_digest", null: false
+    t.string "phone", null: false
+    t.decimal "rating", precision: 3, scale: 2
+    t.string "status", default: "active", null: false
     t.datetime "updated_at", null: false
+    t.string "vehicle_type"
+    t.datetime "verified_at"
     t.index "lower((email)::text)", name: "index_drivers_on_lower_email", unique: true
+    t.index ["phone"], name: "index_drivers_on_phone", unique: true
+    t.index ["status"], name: "index_drivers_on_status"
   end
 
   create_table "refresh_tokens", force: :cascade do |t|

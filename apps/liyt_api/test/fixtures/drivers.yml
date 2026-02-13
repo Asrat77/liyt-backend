@@ -2,4 +2,5 @@
 
 one:
   email: driver@ride.test
+  phone: "+251911000000"
   password_digest: <%= BCrypt::Password.create("password") %>

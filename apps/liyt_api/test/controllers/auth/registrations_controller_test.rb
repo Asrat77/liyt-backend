@@ -5,7 +5,9 @@ class Auth::RegistrationsControllerTest < ActionDispatch::IntegrationTest
     post auth_registrations_path, params: {
       business_name: "Gamma Dispatch",
       email: "admin@gamma.test",
-      password: "password"
+      password: "password",
+      support_email: "support@gamma.test",
+      status: "suspended"
     }
 
     assert_response :created
@@ -18,6 +20,8 @@ class Auth::RegistrationsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "admin@gamma.test", body.dig("user", "email")
     assert_equal "Gamma Dispatch", body.dig("business", "name")
     assert body.dig("business", "slug").present?
+    assert_equal "active", body.dig("business", "status")
+    assert_equal "support@gamma.test", body.dig("business", "support_email")
     assert_includes body["roles"], "admin"
   end
 
@@ -25,7 +29,8 @@ class Auth::RegistrationsControllerTest < ActionDispatch::IntegrationTest
     post auth_registrations_path, params: {
       business_name: "",
       email: "",
-      password: ""
+      password: "",
+      support_email: ""
     }
 
     assert_response :unprocessable_entity
