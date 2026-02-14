@@ -138,6 +138,7 @@ module Drivers
         status: delivery.status,
         price: delivery.price,
         description: delivery.description,
+        driver_id: delivery.driver_id,
         business: delivery.business ? {
           id: delivery.business.id,
           name: delivery.business.name

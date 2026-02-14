@@ -23,9 +23,10 @@ class Drivers::DeliveriesControllerTest < ActionDispatch::IntegrationTest
     assert_response :ok
     body = JSON.parse(response.body)
     assert_equal "accepted", body["status"]
-    assert_equal @driver.id, body["driver_id"]
+    assert_equal @driver.id, body["driver_id"].to_i
     delivery.reload
     assert delivery.accepted_at.present?
+    assert_equal @driver.id, delivery.driver_id
   end
 
   test "marks delivery as picked up" do

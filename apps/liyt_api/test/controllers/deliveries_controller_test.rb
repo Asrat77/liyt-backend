@@ -46,7 +46,7 @@ class DeliveriesControllerTest < ActionDispatch::IntegrationTest
     assert_response :created
     body = JSON.parse(response.body)
     assert_equal "Test delivery", body["description"]
-    assert_equal 150.00, body["price"]
+    assert_equal 150.0, body["price"].to_f
     assert_equal "awaiting_recipient", body["status"]
     assert body["public_id"].present?
     assert body["stops"].present?
