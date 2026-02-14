@@ -1,0 +1,39 @@
+pickup_one:
+  delivery: awaiting_recipient
+  kind: pickup
+  sequence: 0
+  address1: 789 Pickup St
+  city: Addis Ababa
+  region: Addis Ababa
+  country_code: ET
+  contact_name: Acme Logistics
+  contact_phone: "+251900000000"
+
+dropoff_one:
+  delivery: awaiting_recipient
+  kind: dropoff
+  sequence: 1
+  address1: 123 Main St
+  city: Addis Ababa
+  region: Addis Ababa
+  country_code: ET
+  contact_name: John Doe
+  contact_phone: "+251911111111"
+
+pickup_accepted:
+  delivery: accepted
+  kind: pickup
+  sequence: 0
+  address1: 789 Pickup St
+  city: Addis Ababa
+  region: Addis Ababa
+  country_code: ET
+
+dropoff_accepted:
+  delivery: accepted
+  kind: dropoff
+  sequence: 1
+  address1: 456 Business Ave
+  city: Addis Ababa
+  region: Addis Ababa
+  country_code: ET

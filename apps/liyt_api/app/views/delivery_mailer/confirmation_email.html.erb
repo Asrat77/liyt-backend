@@ -1,0 +1,47 @@
+<h1>New Delivery from <%= @business&.name || 'LIYT' %></h1>
+
+<p>Hello,</p>
+
+<p>You have a new delivery request. Here are the details:</p>
+
+<h2>Pickup Location</h2>
+<% if @pickup_stop %>
+  <p>
+    <%= @pickup_stop.address1 %><br>
+    <%= @pickup_stop.address2 %><br>
+    <%= @pickup_stop.city %>, <%= @pickup_stop.region %> <%= @pickup_stop.postal_code %>
+  </p>
+  <% if @pickup_stop.contact_name %>
+    <p>Contact: <%= @pickup_stop.contact_name %> (<%= @pickup_stop.contact_phone %>)</p>
+  <% end %>
+  <% if @pickup_stop.instructions %>
+    <p>Instructions: <%= @pickup_stop.instructions %></p>
+  <% end %>
+<% end %>
+
+<h2>Items</h2>
+<ul>
+  <% @items.each do |item| %>
+    <li><%= item.name %> x <%= item.quantity %></li>
+  <% end %>
+</ul>
+
+<% if @delivery.description.present? %>
+  <h2>Description</h2>
+  <p><%= @delivery.description %></p>
+<% end %>
+
+<h2>Price</h2>
+<p><%= number_to_currency(@delivery.price) %></p>
+
+<p>
+  <a href="<%= @confirmation_url %>" style="background-color: #4CAF50; color: white; padding: 14px 20px; text-decoration: none; border-radius: 4px;">
+    Confirm Delivery
+  </a>
+</p>
+
+<p>Or copy and paste this link: <%= @confirmation_url %></p>
+
+<p>This link will expire in 30 days.</p>
+
+<p>Thank you,<br>LIYT Team</p>

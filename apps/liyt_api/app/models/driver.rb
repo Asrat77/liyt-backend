@@ -1,5 +1,6 @@
 class Driver < ApplicationRecord
   has_many :refresh_tokens, as: :owner, dependent: :destroy
+  has_many :deliveries, dependent: :nullify
 
   has_secure_password
 

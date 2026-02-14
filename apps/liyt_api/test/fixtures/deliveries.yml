@@ -1,0 +1,33 @@
+awaiting_recipient:
+  business: one
+  public_id: DEL001
+  status: 0
+  price: 150.00
+  description: Delivery for John
+
+pending:
+  business: one
+  public_id: DEL002
+  status: 1
+  price: 200.00
+  description: Delivery for Jane
+
+accepted:
+  business: one
+  driver: one
+  public_id: DEL003
+  status: 2
+  price: 175.00
+  accepted_at: <%= 1.hour.ago %>
+  description: Accepted delivery
+
+delivered:
+  business: one
+  driver: one
+  public_id: DEL004
+  status: 5
+  price: 250.00
+  accepted_at: <%= 2.hours.ago %>
+  picked_up_at: <%= 1.hour.ago %>
+  delivered_at: <%= 30.minutes.ago %>
+  description: Completed delivery

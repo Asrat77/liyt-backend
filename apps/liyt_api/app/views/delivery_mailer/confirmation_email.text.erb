@@ -1,0 +1,38 @@
+New Delivery from <%= @business&.name || 'LIYT' %>
+
+Hello,
+
+You have a new delivery request. Here are the details:
+
+PICKUP LOCATION
+<% if @pickup_stop %>
+<%= @pickup_stop.address1 %>
+<%= @pickup_stop.address2 %>
+<%= @pickup_stop.city %>, <%= @pickup_stop.region %> <%= @pickup_stop.postal_code %>
+<% if @pickup_stop.contact_name %>
+Contact: <%= @pickup_stop.contact_name %> (<%= @pickup_stop.contact_phone %>)
+<% end %>
+<% if @pickup_stop.instructions %>
+Instructions: <%= @pickup_stop.instructions %>
+<% end %>
+<% end %>
+
+ITEMS
+<% @items.each do |item| %>
+- <%= item.name %> x <%= item.quantity %>
+<% end %>
+
+<% if @delivery.description.present? %>
+DESCRIPTION
+<%= @delivery.description %>
+<% end %>
+
+PRICE
+<%= number_to_currency(@delivery.price) %>
+
+Confirm your delivery: <%= @confirmation_url %>
+
+This link will expire in 30 days.
+
+Thank you,
+LIYT Team

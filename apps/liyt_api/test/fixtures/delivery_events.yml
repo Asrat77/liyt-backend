@@ -1,0 +1,16 @@
+event_created:
+  delivery: awaiting_recipient
+  event_type: created
+  to_status: 0
+  actor_type: User
+  actor_id: 1
+  occurred_at: <%= 1.day.ago %>
+
+event_accepted:
+  delivery: accepted
+  event_type: accepted
+  from_status: 1
+  to_status: 2
+  actor_type: Driver
+  actor_id: 1
+  occurred_at: <%= 1.hour.ago %>
