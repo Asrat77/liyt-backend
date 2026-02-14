@@ -1,0 +1,17 @@
+one:
+  customer: one
+  name: Home
+  address1: 123 Main St
+  city: Addis Ababa
+  region: Addis Ababa
+  country_code: ET
+  is_default: true
+
+two:
+  customer: two
+  name: Office
+  address1: 456 Business Ave
+  city: Addis Ababa
+  region: Addis Ababa
+  country_code: ET
+  is_default: true

@@ -4,6 +4,6 @@ require_relative "../../../../domains/delivery/registration"
 
 Liyt::Configuration.new(
   registrations: [
-    Delivery::Registration.new
+    Deliveries::Registration.new
   ]
 ).call
