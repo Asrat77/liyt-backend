@@ -1,0 +1,9 @@
+token_one:
+  delivery: awaiting_recipient
+  token_hash: <%= Digest::SHA256.hexdigest('test-token-1') %>
+  expires_at: <%= 30.days.from_now %>
+
+token_pending:
+  delivery: pending
+  token_hash: <%= Digest::SHA256.hexdigest('test-token-2') %>
+  expires_at: <%= 30.days.from_now %>

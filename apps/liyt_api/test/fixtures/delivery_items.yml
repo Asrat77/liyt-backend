@@ -1,0 +1,14 @@
+item_one:
+  delivery: awaiting_recipient
+  name: Package A
+  quantity: 2
+
+item_two:
+  delivery: awaiting_recipient
+  name: Package B
+  quantity: 1
+
+item_accepted:
+  delivery: accepted
+  name: Documents
+  quantity: 1

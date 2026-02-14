@@ -320,3 +320,383 @@ This document lists all routes defined in `apps/liyt_api/config/routes.rb`, with
   "updated_at": "2026-02-13T16:31:54Z"
 }
 ```
+
+## Deliveries (Business)
+
+### GET /deliveries
+
+- Controller: `DeliveriesController#index`
+- Auth: required (user token)
+- Query params:
+  - `status` (string, optional): filter by status
+- Responses:
+  - 200 OK: list of deliveries for the current tenant
+- Response body:
+```json
+[
+  {
+    "id": 1,
+    "public_id": "ABC123XYZ",
+    "status": "awaiting_recipient",
+    "price": 150.00,
+    "description": "Package delivery",
+    "business_id": 1,
+    "driver_id": null,
+    "customer_id": null,
+    "accepted_at": null,
+    "picked_up_at": null,
+    "delivered_at": null,
+    "cancelled_at": null,
+    "created_at": "2026-02-14T20:17:01Z"
+  }
+]
+```
+
+### GET /deliveries/:id
+
+- Controller: `DeliveriesController#show`
+- Auth: required (user token)
+- Responses:
+  - 200 OK: delivery details with stops and items
+  - 404 Not Found: delivery not found or not in tenant
+- Response body:
+```json
+{
+  "id": 1,
+  "public_id": "ABC123XYZ",
+  "status": "awaiting_recipient",
+  "price": 150.00,
+  "description": "Package delivery",
+  "business_id": 1,
+  "driver_id": null,
+  "customer_id": null,
+  "accepted_at": null,
+  "picked_up_at": null,
+  "delivered_at": null,
+  "cancelled_at": null,
+  "created_at": "2026-02-14T20:17:01Z",
+  "stops": [
+    {
+      "id": 1,
+      "kind": "pickup",
+      "sequence": 0,
+      "address1": "123 Pickup St",
+      "city": "Addis Ababa",
+      "region": "Addis Ababa",
+      "contact_name": "Sender Name",
+      "contact_phone": "+251911111111"
+    }
+  ],
+  "items": [
+    {
+      "id": 1,
+      "name": "Package A",
+      "quantity": 2
+    }
+  ]
+}
+```
+
+### POST /deliveries
+
+- Controller: `DeliveriesController#create`
+- Auth: required (admin only)
+- Body:
+  - `description` (string, optional)
+  - `price` (decimal, optional): default 0.00
+  - `recipient_email` (string, required): email to send confirmation
+  - `pickup` (object, required):
+    - `address1` (string)
+    - `address2` (string, optional)
+    - `city` (string)
+    - `region` (string)
+    - `postal_code` (string, optional)
+    - `country_code` (string)
+    - `latitude` (decimal, optional)
+    - `longitude` (decimal, optional)
+    - `contact_name` (string)
+    - `contact_phone` (string)
+    - `instructions` (string, optional)
+  - `items` (array, required):
+    - `name` (string)
+    - `quantity` (integer, default 1)
+- Flow:
+  - Create delivery with status `awaiting_recipient`
+  - Create pickup stop
+  - Create items
+  - Generate tracking token
+  - Send confirmation email to recipient
+- Responses:
+  - 201 Created: delivery created
+  - 403 Forbidden: non-admin user
+  - 422 Unprocessable Entity: invalid data
+
+### PATCH /deliveries/:id/cancel
+
+- Controller: `DeliveriesController#cancel`
+- Auth: required (admin only)
+- Body:
+  - `reason` (string, optional)
+- Restrictions:
+  - Can only cancel when status is `awaiting_recipient` or `pending`
+- Responses:
+  - 204 No Content: cancelled
+  - 403 Forbidden: non-admin user
+  - 404 Not Found: delivery not found
+  - 422 Unprocessable Entity: cannot cancel at this stage
+
+## Driver Deliveries
+
+### GET /drivers/deliveries
+
+- Controller: `Drivers::DeliveriesController#index`
+- Auth: required (driver token)
+- Responses:
+  - 200 OK: list of available and assigned deliveries
+- Response body:
+```json
+[
+  {
+    "id": 1,
+    "public_id": "ABC123XYZ",
+    "status": "pending",
+    "price": 150.00,
+    "description": "Package delivery",
+    "pickup_address": {
+      "city": "Addis Ababa",
+      "region": "Addis Ababa"
+    },
+    "dropoff_address": {
+      "city": "Addis Ababa",
+      "region": "Addis Ababa"
+    },
+    "created_at": "2026-02-14T20:17:01Z"
+  }
+]
+```
+
+### GET /drivers/deliveries/:id
+
+- Controller: `Drivers::DeliveriesController#show`
+- Auth: required (driver token)
+- Responses:
+  - 200 OK: full delivery details
+  - 404 Not Found: delivery not found or not available
+- Response body:
+```json
+{
+  "id": 1,
+  "public_id": "ABC123XYZ",
+  "status": "pending",
+  "price": 150.00,
+  "description": "Package delivery",
+  "business": {
+    "id": 1,
+    "name": "Acme Logistics"
+  },
+  "customer": {
+    "id": 1,
+    "full_name": "John Doe",
+    "phone": "+251911111111"
+  },
+  "pickup": {
+    "address1": "123 Pickup St",
+    "city": "Addis Ababa",
+    "contact_name": "Sender Name",
+    "contact_phone": "+251900000000"
+  },
+  "dropoff": {
+    "address1": "456 Dropoff Ave",
+    "city": "Addis Ababa",
+    "contact_name": "John Doe",
+    "contact_phone": "+251911111111"
+  },
+  "items": [
+    { "name": "Package A", "quantity": 2 }
+  ],
+  "accepted_at": null,
+  "picked_up_at": null,
+  "delivered_at": null
+}
+```
+
+### PATCH /drivers/deliveries/:id/accept
+
+- Controller: `Drivers::DeliveriesController#accept`
+- Auth: required (driver token)
+- Restrictions:
+  - Delivery must be in `pending` status
+  - Delivery must not be assigned to another driver
+- Flow:
+  - Assign driver to delivery
+  - Change status to `accepted`
+  - Record `accepted_at` timestamp
+  - Create delivery event
+- Responses:
+  - 200 OK: delivery accepted
+  - 403 Forbidden: delivery assigned to another driver
+  - 404 Not Found: delivery not found
+  - 422 Unprocessable Entity: delivery not available
+
+### PATCH /drivers/deliveries/:id/pickup
+
+- Controller: `Drivers::DeliveriesController#pickup`
+- Auth: required (driver token)
+- Restrictions:
+  - Delivery must be in `accepted` status
+  - Delivery must be assigned to current driver
+- Flow:
+  - Change status to `picked_up`
+  - Record `picked_up_at` timestamp
+  - Create delivery event
+- Responses:
+  - 200 OK: pickup recorded
+  - 403 Forbidden: delivery not assigned to you
+  - 404 Not Found: delivery not found
+  - 422 Unprocessable Entity: delivery not in accepted state
+
+### PATCH /drivers/deliveries/:id/complete
+
+- Controller: `Drivers::DeliveriesController#complete`
+- Auth: required (driver token)
+- Restrictions:
+  - Delivery must be in `picked_up` or `in_transit` status
+  - Delivery must be assigned to current driver
+- Flow:
+  - Change status to `delivered`
+  - Record `delivered_at` timestamp
+  - Create delivery event
+- Responses:
+  - 200 OK: delivery completed
+  - 403 Forbidden: delivery not assigned to you
+  - 404 Not Found: delivery not found
+  - 422 Unprocessable Entity: delivery not ready for completion
+
+## Customer Confirmations (Public)
+
+### GET /customers/confirmation
+
+- Controller: `Customers::ConfirmationsController#show`
+- Auth: not required
+- Query params:
+  - `token` (string, required): tracking token from email
+- Responses:
+  - 200 OK: delivery preview
+  - 404 Not Found: token not found
+  - 410 Gone: token expired
+- Response body:
+```json
+{
+  "delivery": {
+    "public_id": "ABC123XYZ",
+    "status": "awaiting_recipient",
+    "description": "Package delivery",
+    "price": 150.00,
+    "business": {
+      "id": 1,
+      "name": "Acme Logistics"
+    },
+    "pickup": {
+      "address1": "123 Pickup St",
+      "city": "Addis Ababa"
+    },
+    "items": [
+      { "name": "Package A", "quantity": 2 }
+    ]
+  }
+}
+```
+
+### POST /customers/confirmation
+
+- Controller: `Customers::ConfirmationsController#confirm`
+- Auth: not required
+- Body:
+  - `token` (string, required): tracking token from email
+  - `full_name` (string, required): customer name
+  - `phone` (string, required): customer phone
+  - `email` (string, optional): customer email
+  - `dropoff` (object, required) OR `location` (object, required):
+    - `address1` (string)
+    - `address2` (string, optional)
+    - `city` (string)
+    - `region` (string)
+    - `postal_code` (string, optional)
+    - `country_code` (string)
+    - `latitude` (decimal, optional)
+    - `longitude` (decimal, optional)
+    - `instructions` (string, optional)
+    - `name` (string, optional): for saved location (e.g., "Home", "Office")
+- Flow:
+  - Find or create customer by phone/email
+  - Create customer location (if name provided)
+  - Create dropoff stop
+  - Update delivery status to `pending`
+  - Create delivery event
+- Responses:
+  - 200 OK: delivery confirmed
+  - 404 Not Found: token not found
+  - 410 Gone: token expired
+  - 422 Unprocessable Entity: already confirmed or invalid data
+- Response body:
+```json
+{
+  "message": "Delivery confirmed successfully",
+  "delivery": {
+    "public_id": "ABC123XYZ",
+    "status": "pending",
+    "tracking_url": "https://liyt.com/track/xyz123"
+  }
+}
+```
+
+## Tracking (Public)
+
+### GET /track/:token
+
+- Controller: `TrackingController#show`
+- Auth: not required
+- URL params:
+  - `token` (string, required): tracking token hash
+- Restrictions:
+  - Token must not be expired
+  - Delivery must not be in `awaiting_recipient` status (must be confirmed first)
+- Responses:
+  - 200 OK: delivery status and tracking info
+  - 404 Not Found: token not found or delivery not confirmed
+  - 410 Gone: token expired
+- Response body:
+```json
+{
+  "delivery": {
+    "public_id": "ABC123XYZ",
+    "status": "picked_up",
+    "price": 150.00,
+    "description": "Package delivery",
+    "accepted_at": "2026-02-14T21:00:00Z",
+    "picked_up_at": "2026-02-14T22:00:00Z",
+    "delivered_at": null,
+    "business": {
+      "name": "Acme Logistics"
+    },
+    "driver": {
+      "full_name": "Sam Rider",
+      "phone": "+251922222222",
+      "vehicle_type": "motorbike",
+      "last_latitude": "9.1450",
+      "last_longitude": "40.4897",
+      "last_location_at": "2026-02-14T22:05:00Z"
+    },
+    "pickup": {
+      "address1": "123 Pickup St",
+      "city": "Addis Ababa",
+      "contact_name": "Sender Name"
+    },
+    "dropoff": {
+      "address1": "456 Dropoff Ave",
+      "city": "Addis Ababa",
+      "contact_name": "John Doe"
+    }
+  }
+}
+```

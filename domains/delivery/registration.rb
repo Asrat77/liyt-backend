@@ -1,4 +1,4 @@
-module Delivery
+module Deliveries
   class Registration
     def call; end
   end
