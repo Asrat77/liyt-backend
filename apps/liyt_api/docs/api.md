@@ -607,7 +607,7 @@ This document lists all routes defined in `apps/liyt_api/config/routes.rb`, with
 }
 ```
 
-### POST /customers/confirmation
+### POST /customers/confirmation/confirm
 
 - Controller: `Customers::ConfirmationsController#confirm`
 - Auth: not required

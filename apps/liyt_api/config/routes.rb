@@ -41,10 +41,8 @@ Rails.application.routes.draw do
   end
 
   namespace :customers do
-    resource :confirmation, only: [] do
-      get :show
-      post :confirm
-    end
+    get "confirmation", to: "confirmations#show"
+    post "confirmation/confirm", to: "confirmations#confirm"
   end
 
   get "track/:token", to: "tracking#show", as: :tracking
