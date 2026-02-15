@@ -49,7 +49,9 @@ class TrackingController < ApplicationController
       city: stop.city,
       region: stop.region,
       contact_name: stop.contact_name,
-      contact_phone: stop.contact_phone
+      contact_phone: stop.contact_phone,
+      latitude: stop.latitude,
+      longitude: stop.longitude
     }
   end
 end
