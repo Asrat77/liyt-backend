@@ -16,7 +16,7 @@ module TokenIssuer
       access_token: access_token,
       refresh_token: refresh_raw,
       token_type: "Bearer",
-      expires_in: 15.minutes.to_i
+      expires_in: 120.minutes.to_i
     }
   end
 
