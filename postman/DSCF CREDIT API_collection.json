@@ -1,0 +1,303 @@
+{
+  "info": {
+    "name": "DSCF Credit API",
+    "description": "Postman collection for DSCF Credit API endpoints.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Pre-request script (collection-level)",
+          "// Token is set via {{accessToken}} environment variable"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "accessToken",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Api Keys",
+      "item": [
+        {
+          "name": "List Api Keys",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text",
+                "description": "Required JWT for staff/admin user"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api_keys",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api_keys"
+              ]
+            },
+            "description": "Lists API keys for the current tenant. Requires authenticated staff/admin user."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response is an array of api key objects', function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(Array.isArray(json)).to.eql(true);",
+                  "  if (json.length > 0) {",
+                  "    pm.expect(json[0]).to.have.property('id');",
+                  "    pm.expect(json[0]).to.have.property('name');",
+                  "    pm.expect(json[0]).to.have.property('scopes');",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Api Key by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text",
+                "description": "Required JWT for staff/admin user"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api_keys/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api_keys",
+                "1"
+              ]
+            },
+            "description": "Gets one API key by ID for the current tenant. Requires authenticated staff/admin user."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response has expected api key fields', function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property('id');",
+                  "  pm.expect(json).to.have.property('business_id');",
+                  "  pm.expect(json).to.have.property('name');",
+                  "  pm.expect(json).to.have.property('scopes');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Api Key",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text",
+                "description": "Required JWT for admin user"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Acme Warehouse Integration\",\n  \"expires_at\": \"2026-12-31T23:59:59Z\",\n  \"scopes\": [\"deliveries:write\"]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api_keys",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api_keys"
+              ]
+            },
+            "description": "Creates an API key. Accepted body params: name, expires_at, scopes[]."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Response includes newly issued plaintext key', function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property('id');",
+                  "  pm.expect(json).to.have.property('plaintext_key');",
+                  "  pm.expect(json.plaintext_key).to.be.a('string');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Revoke Api Key",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text",
+                "description": "Required JWT for admin user"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api_keys/1/revoke",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api_keys",
+                "1",
+                "revoke"
+              ]
+            },
+            "description": "Revokes an API key by setting revoked_at/revoked_by_user_id. No request body required."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response shows revoked key', function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property('id');",
+                  "  pm.expect(json).to.have.property('revoked_at');",
+                  "  pm.expect(json.revoked_at).to.not.eql(null);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Rotate Api Key",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text",
+                "description": "Required JWT for admin user"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Acme Warehouse Integration Rotated\",\n  \"expires_at\": \"2027-12-31T23:59:59Z\",\n  \"scopes\": [\"deliveries:write\"]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api_keys/1/rotate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api_keys",
+                "1",
+                "rotate"
+              ]
+            },
+            "description": "Rotates an API key by revoking current key and creating a replacement. Body params are optional and match create params."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Response includes replacement plaintext key', function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property('id');",
+                  "  pm.expect(json).to.have.property('plaintext_key');",
+                  "  pm.expect(json.plaintext_key).to.be.a('string');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

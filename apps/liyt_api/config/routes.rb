@@ -34,6 +34,13 @@ Rails.application.routes.draw do
 
   resources :business_locations, only: [ :index, :show, :create, :update, :destroy ]
 
+  resources :api_keys, only: [ :index, :show, :create ] do
+    member do
+      patch :revoke
+      patch :rotate
+    end
+  end
+
   resources :deliveries, only: [ :index, :show, :create ] do
     member do
       patch :cancel
