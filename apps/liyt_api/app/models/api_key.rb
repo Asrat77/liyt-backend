@@ -32,6 +32,10 @@ class ApiKey < ApplicationRecord
     scopes.include?(scope.to_s)
   end
 
+  def reload(*)
+    super.tap { remove_instance_variable(:@plaintext_key) if instance_variable_defined?(:@plaintext_key) }
+  end
+
   private
 
   def normalize_scopes
