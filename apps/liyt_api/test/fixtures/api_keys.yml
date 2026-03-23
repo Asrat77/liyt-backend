@@ -1,0 +1,33 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+active:
+  business: one
+  created_by_user: one
+  name: Warehouse Integration
+  prefix: a1b2c3d4e5f6
+  key_hash: <%= Infra::TokenHashing.digest("a1b2c3d4e5f6.active-secret") %>
+  scopes:
+    - deliveries:write
+  last_used_at: <%= 2.hours.ago %>
+  expires_at: <%= 2.days.from_now %>
+
+expired:
+  business: one
+  created_by_user: one
+  name: Legacy Integration
+  prefix: b1c2d3e4f5a6
+  key_hash: <%= Infra::TokenHashing.digest("b1c2d3e4f5a6.expired-secret") %>
+  scopes:
+    - deliveries:write
+  expires_at: <%= 1.day.ago %>
+
+revoked:
+  business: one
+  created_by_user: one
+  revoked_by_user: one
+  name: Revoked Partner Key
+  prefix: c1d2e3f4a5b6
+  key_hash: <%= Infra::TokenHashing.digest("c1d2e3f4a5b6.revoked-secret") %>
+  scopes:
+    - deliveries:write
+  revoked_at: <%= 1.hour.ago %>

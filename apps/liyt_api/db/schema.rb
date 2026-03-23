@@ -10,9 +10,30 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_14_201724) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_23_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "api_keys", force: :cascade do |t|
+    t.bigint "business_id", null: false
+    t.bigint "created_by_user_id"
+    t.datetime "created_at", null: false
+    t.datetime "expires_at"
+    t.string "key_hash", null: false
+    t.datetime "last_used_at"
+    t.string "name", null: false
+    t.string "prefix", null: false
+    t.datetime "revoked_at"
+    t.bigint "revoked_by_user_id"
+    t.string "scopes", default: [], null: false, array: true
+    t.datetime "updated_at", null: false
+    t.index ["business_id", "revoked_at", "expires_at"], name: "index_api_keys_on_business_active_lookup"
+    t.index ["business_id"], name: "index_api_keys_on_business_id"
+    t.index ["created_by_user_id"], name: "index_api_keys_on_created_by_user_id"
+    t.index ["key_hash"], name: "index_api_keys_on_key_hash", unique: true
+    t.index ["prefix"], name: "index_api_keys_on_prefix", unique: true
+    t.index ["revoked_by_user_id"], name: "index_api_keys_on_revoked_by_user_id"
+  end
 
   create_table "business_locations", force: :cascade do |t|
     t.boolean "active", default: true, null: false
@@ -221,6 +242,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_14_201724) do
   end
 
   add_foreign_key "business_locations", "businesses"
+  add_foreign_key "api_keys", "businesses"
+  add_foreign_key "api_keys", "users", column: "created_by_user_id"
+  add_foreign_key "api_keys", "users", column: "revoked_by_user_id"
   add_foreign_key "roles", "businesses"
   add_foreign_key "user_roles", "roles"
   add_foreign_key "user_roles", "users"
