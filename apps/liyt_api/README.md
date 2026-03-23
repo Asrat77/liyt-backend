@@ -63,6 +63,37 @@ curl -sS -X POST "https://YOUR_DOMAIN/deliveries" \
   }'
 ```
 
+### 1b. Integration creates delivery with API key
+
+`POST /deliveries` also supports API-key auth for partner integrations.
+
+- Header: `X-API-Key: <PLAINTEXT_KEY>`
+- Required scope on key: `deliveries:write`
+- Pickup resolution: request `pickup` values override `business_settings` defaults
+- If required pickup fields are unresolved after merge, API returns `422` with `pickup_invalid`
+
+```bash
+curl -sS -X POST "https://YOUR_DOMAIN/deliveries" \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: <PLAINTEXT_KEY>" \
+  -d '{
+    "description": "API-key delivery",
+    "recipient_email": "john@example.com",
+    "items": [
+      {"name": "Documents", "quantity": 1}
+    ]
+  }'
+```
+
+Example `422` when pickup data is incomplete and no defaults exist:
+
+```json
+{
+  "error": "pickup_invalid",
+  "missing_fields": ["address1", "city", "region", "country_code", "contact_name", "contact_phone"]
+}
+```
+
 ### 2. Recipient confirms delivery (via email link)
 
 ```bash
@@ -146,3 +177,57 @@ curl -sS -X POST "https://YOUR_DOMAIN/business_locations" \
 curl -sS -X GET "https://YOUR_DOMAIN/business_locations" \
   -H "Authorization: Bearer <BUSINESS_TOKEN>"
 ```
+
+## Business pickup defaults
+
+Business admins can manage default pickup fields used by `POST /deliveries`.
+
+### Update defaults
+
+```bash
+curl -sS -X PATCH "https://YOUR_DOMAIN/business_settings" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <BUSINESS_TOKEN>" \
+  -d '{
+    "pickup_address1": "Warehouse 9",
+    "pickup_city": "Adama",
+    "pickup_region": "Oromia",
+    "pickup_country_code": "ET",
+    "pickup_contact_name": "Dispatch",
+    "pickup_contact_phone": "+251922222222",
+    "pickup_instructions": "Use loading bay"
+  }'
+```
+
+## API key lifecycle
+
+All API key management routes use user JWT auth (not API-key auth):
+
+- `GET /api_keys` (staff/admin)
+- `GET /api_keys/:id` (staff/admin)
+- `POST /api_keys` (admin)
+- `PATCH /api_keys/:id/revoke` (admin)
+- `PATCH /api_keys/:id/rotate` (admin)
+
+### Create API key (admin)
+
+```bash
+curl -sS -X POST "https://YOUR_DOMAIN/api_keys" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <BUSINESS_TOKEN>" \
+  -d '{
+    "name": "Orders Integration",
+    "scopes": ["deliveries:write"]
+  }'
+```
+
+The response includes `plaintext_key` once. Store it immediately.
+
+### Rotate API key (admin)
+
+```bash
+curl -sS -X PATCH "https://YOUR_DOMAIN/api_keys/<KEY_ID>/rotate" \
+  -H "Authorization: Bearer <BUSINESS_TOKEN>"
+```
+
+Rotate revokes the old key and returns a new one-time `plaintext_key`.

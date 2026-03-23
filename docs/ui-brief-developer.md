@@ -23,6 +23,9 @@ Screen-by-screen info hierarchy
 - Secondary: created_at, last_used_at, expiry
 - Actions: create, revoke
 - Empty state: no keys -> "Create API key"
+- RBAC:
+	- `admin` and `staff` can view list/details
+	- only `admin` can create/revoke/rotate keys
 
 3) Create API Key flow
 
@@ -30,11 +33,28 @@ Screen-by-screen info hierarchy
 - Secondary: confirmation step
 - One-time secret: show plaintext key once with copy CTA and warning
 
+3b) Rotate API Key flow
+
+- Action: rotate from key detail/list row
+- Behavior: revoke old key and return a new one-time plaintext key
+- Warning: old key becomes invalid immediately
+
 4) API Key detail (optional)
 
 - Primary: key metadata and status
 - Secondary: recent usage (if `api_requests` shown)
 - Actions: rotate (create new + revoke old), set expiry
+
+5) API Delivery Setup
+
+- Primary: `POST /deliveries` supports `X-API-Key` with `deliveries:write`
+- Secondary: show fallback rules for pickup defaults
+	- request pickup fields override defaults
+	- missing required fields return `422 pickup_invalid`
+- Tertiary: troubleshooting states
+	- `401` invalid/revoked/expired key
+	- `403` scope missing
+	- `422` incomplete pickup after defaults merge
 
 Critical UI states and edge cases
 
