@@ -10,6 +10,10 @@ class DeliveriesControllerTest < ActionDispatch::IntegrationTest
       "typ" => "user"
     })
     @business = @user.business
+
+    @active_api_key = "a1b2c3d4e5f6.active-secret"
+    @expired_api_key = "b1c2d3e4f5a6.expired-secret"
+    @revoked_api_key = "c1d2e3f4a5b6.revoked-secret"
   end
 
   test "lists business deliveries" do
@@ -20,27 +24,23 @@ class DeliveriesControllerTest < ActionDispatch::IntegrationTest
     assert body.is_a?(Array)
   end
 
+  test "uses jwt auth for non-create endpoint when x-api-key header is also present" do
+    get deliveries_path,
+      headers: {
+        "Authorization" => "Bearer #{@token}",
+        "X-API-Key" => "nope.not-a-real-key"
+      }
+
+    assert_response :ok
+    body = JSON.parse(response.body)
+    assert body.is_a?(Array)
+  end
+
   test "creates a delivery" do
     assert_difference("Delivery.count") do
       post deliveries_path,
         headers: { "Authorization" => "Bearer #{@token}" },
-        params: {
-          description: "Test delivery",
-          price: 150.00,
-          recipient_email: "customer@example.com",
-          pickup: {
-            address1: "123 Pickup St",
-            city: "Addis Ababa",
-            region: "Addis Ababa",
-            country_code: "ET",
-            contact_name: "Sender Name",
-            contact_phone: "+251911111111"
-          },
-          items: [
-            { name: "Package A", quantity: 2 },
-            { name: "Package B", quantity: 1 }
-          ]
-        }
+        params: delivery_create_params
     end
 
     assert_response :created
@@ -51,6 +51,91 @@ class DeliveriesControllerTest < ActionDispatch::IntegrationTest
     assert body["public_id"].present?
     assert body["stops"].present?
     assert body["items"].present?
+  end
+
+  test "creates a delivery with active api key and scope" do
+    assert_difference("Delivery.count") do
+      post deliveries_path,
+        headers: api_key_header(@active_api_key),
+        params: delivery_create_params
+    end
+
+    assert_response :created
+    body = JSON.parse(response.body)
+
+    assert_equal users(:one).business_id, body["business_id"]
+    assert_equal "Test delivery", body["description"]
+
+    delivery = Delivery.find_by!(public_id: body["public_id"])
+    created_event = delivery.delivery_events.find_by!(event_type: "created")
+    assert_equal "ApiKey", created_event.actor_type
+    assert_equal api_keys(:active).id, created_event.actor_id
+  end
+
+  test "returns unauthorized when api key is missing for delivery create" do
+    post deliveries_path, params: delivery_create_params
+
+    assert_response :unauthorized
+  end
+
+  test "returns unauthorized for invalid api key" do
+    post deliveries_path,
+      headers: api_key_header("nope.not-a-real-key"),
+      params: delivery_create_params
+
+    assert_response :unauthorized
+  end
+
+  test "returns unauthorized for revoked api key" do
+    post deliveries_path,
+      headers: api_key_header(@revoked_api_key),
+      params: delivery_create_params
+
+    assert_response :unauthorized
+  end
+
+  test "returns unauthorized for expired api key" do
+    post deliveries_path,
+      headers: api_key_header(@expired_api_key),
+      params: delivery_create_params
+
+    assert_response :unauthorized
+  end
+
+  test "returns forbidden when api key does not include deliveries:write scope" do
+    narrow_key = ApiKey.create!(
+      business: @business,
+      created_by_user: @user,
+      name: "Read Only",
+      scopes: [ "deliveries:read" ]
+    )
+
+    post deliveries_path,
+      headers: api_key_header(narrow_key.plaintext_key),
+      params: delivery_create_params
+
+    assert_response :forbidden
+  end
+
+  test "uses api key tenant context when api key and jwt are both provided" do
+    cross_tenant_user = users(:two)
+    cross_tenant_token = Infra::Jwt.encode({
+      "sub" => cross_tenant_user.id,
+      "biz" => cross_tenant_user.business_id,
+      "typ" => "user"
+    })
+
+    assert_difference("Delivery.count") do
+      post deliveries_path,
+        headers: api_key_header(@active_api_key).merge("Authorization" => "Bearer #{cross_tenant_token}"),
+        params: delivery_create_params
+    end
+
+    assert_response :created
+    body = JSON.parse(response.body)
+
+    assert_equal users(:one).business_id, body["business_id"]
+    refute_equal cross_tenant_user.business_id, body["business_id"]
   end
 
   test "shows a delivery" do
@@ -87,5 +172,31 @@ class DeliveriesControllerTest < ActionDispatch::IntegrationTest
       params: { reason: "Customer requested" }
 
     assert_response :unprocessable_entity
+  end
+
+  private
+
+  def api_key_header(raw_key)
+    { "X-API-Key" => raw_key }
+  end
+
+  def delivery_create_params
+    {
+      description: "Test delivery",
+      price: 150.00,
+      recipient_email: "customer@example.com",
+      pickup: {
+        address1: "123 Pickup St",
+        city: "Addis Ababa",
+        region: "Addis Ababa",
+        country_code: "ET",
+        contact_name: "Sender Name",
+        contact_phone: "+251911111111"
+      },
+      items: [
+        { name: "Package A", quantity: 2 },
+        { name: "Package B", quantity: 1 }
+      ]
+    }
   end
 end

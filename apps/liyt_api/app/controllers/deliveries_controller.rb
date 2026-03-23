@@ -1,6 +1,9 @@
 class DeliveriesController < ApplicationController
+  DELIVERY_WRITE_SCOPE = "deliveries:write".freeze
+
   before_action :ensure_current_tenant
-  before_action :ensure_can_administer, only: [ :create, :cancel ]
+  before_action :ensure_can_create_deliveries, only: [ :create ]
+  before_action :ensure_can_administer, only: [ :cancel ]
   before_action :set_delivery, only: [ :show, :cancel ]
 
   def index
@@ -32,8 +35,7 @@ class DeliveriesController < ApplicationController
         delivery: delivery,
         event_type: "created",
         to_status: delivery.status,
-        actor_type: "User",
-        actor_id: Current.actor.id,
+        **event_actor_attributes,
         occurred_at: Time.current
       )
     end
@@ -81,9 +83,14 @@ class DeliveriesController < ApplicationController
   end
 
   def ensure_can_administer
-    unless Current.actor.roles.exists?(name: "admin")
-      head(:forbidden)
-    end
+    head(:forbidden) unless Current.actor&.roles&.exists?(name: "admin")
+  end
+
+  def ensure_can_create_deliveries
+    return if Current.actor&.roles&.exists?(name: "admin")
+    return if Current.api_key&.allows_scope?(DELIVERY_WRITE_SCOPE)
+
+    head :forbidden
   end
 
   def set_delivery
@@ -140,6 +147,13 @@ class DeliveriesController < ApplicationController
     token.update!(token_hash: token_hash, expires_at: 30.days.from_now)
     token.instance_variable_set(:@raw_token, raw_token)
     token
+  end
+
+  def event_actor_attributes
+    return { actor_type: "User", actor_id: Current.actor.id } if Current.actor
+    return { actor_type: "ApiKey", actor_id: Current.api_key.id } if Current.api_key
+
+    {}
   end
 
   def send_confirmation_email(delivery, recipient_email)
