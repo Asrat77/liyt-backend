@@ -2,6 +2,8 @@ class User < ApplicationRecord
   belongs_to :business
 
   has_many :refresh_tokens, as: :owner, dependent: :destroy
+  has_many :created_api_keys, class_name: "ApiKey", foreign_key: :created_by_user_id, dependent: :nullify
+  has_many :revoked_api_keys, class_name: "ApiKey", foreign_key: :revoked_by_user_id, dependent: :nullify
 
   include RoleHelpers
 

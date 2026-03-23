@@ -17,6 +17,6 @@ class DeliveryMailer < ApplicationMailer
 
   def generate_confirmation_url
     base_url = ENV.fetch("FRONTEND_URL", "https://liyt.com")
-    "#{base_url}/confirm-delivery?token=#{@tracking_token&.token_hash}"
+    "#{base_url}/customers/confirmation?token=#{@tracking_token&.token_hash}"
   end
 end

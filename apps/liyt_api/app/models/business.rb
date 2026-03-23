@@ -2,6 +2,7 @@ class Business < ApplicationRecord
   has_many :users, dependent: :destroy
   has_many :roles, dependent: :destroy
   has_many :refresh_tokens, through: :users
+  has_many :api_keys, dependent: :destroy
   has_many :business_locations, dependent: :destroy
   has_many :deliveries, dependent: :nullify
 
