@@ -4,6 +4,7 @@ class Business < ApplicationRecord
   has_many :refresh_tokens, through: :users
   has_many :api_keys, dependent: :destroy
   has_many :business_locations, dependent: :destroy
+  has_one :business_setting, dependent: :destroy
   has_many :deliveries, dependent: :nullify
 
   before_validation :ensure_slug

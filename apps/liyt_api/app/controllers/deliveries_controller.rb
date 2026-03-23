@@ -1,5 +1,6 @@
 class DeliveriesController < ApplicationController
   DELIVERY_WRITE_SCOPE = "deliveries:write".freeze
+  PICKUP_REQUIRED_FIELDS = %i[ address1 city region country_code contact_name contact_phone ].freeze
 
   before_action :ensure_current_tenant
   before_action :ensure_can_create_deliveries, only: [ :create ]
@@ -18,6 +19,10 @@ class DeliveriesController < ApplicationController
   end
 
   def create
+    pickup_attributes = resolved_pickup_attributes
+    missing_pickup_fields = missing_pickup_fields_for(pickup_attributes)
+    return render_pickup_invalid(missing_pickup_fields) if missing_pickup_fields.any?
+
     delivery = nil
 
     ApplicationRecord.transaction do
@@ -27,7 +32,7 @@ class DeliveriesController < ApplicationController
         price: delivery_params[:price] || 0.0
       )
 
-      create_pickup_stop(delivery, delivery_params[:pickup])
+      create_pickup_stop(delivery, pickup_attributes)
       create_items(delivery, delivery_params[:items])
       create_tracking_token(delivery)
 
@@ -127,6 +132,44 @@ class DeliveriesController < ApplicationController
       contact_phone: pickup_params[:contact_phone],
       instructions: pickup_params[:instructions]
     )
+  end
+
+  def resolved_pickup_attributes
+    default_pickup_attributes.merge(request_pickup_attributes)
+  end
+
+  def request_pickup_attributes
+    (delivery_params[:pickup]&.to_h || {}).symbolize_keys.reject { |_field, value| value.blank? }
+  end
+
+  def default_pickup_attributes
+    business_setting = Current.tenant&.business_setting
+    return {} unless business_setting
+
+    {
+      address1: business_setting.pickup_address1,
+      address2: business_setting.pickup_address2,
+      city: business_setting.pickup_city,
+      region: business_setting.pickup_region,
+      postal_code: business_setting.pickup_postal_code,
+      country_code: business_setting.pickup_country_code,
+      latitude: business_setting.pickup_latitude,
+      longitude: business_setting.pickup_longitude,
+      contact_name: business_setting.pickup_contact_name,
+      contact_phone: business_setting.pickup_contact_phone,
+      instructions: business_setting.pickup_instructions
+    }
+  end
+
+  def missing_pickup_fields_for(pickup_attributes)
+    PICKUP_REQUIRED_FIELDS.select { |field| pickup_attributes[field].blank? }
+  end
+
+  def render_pickup_invalid(missing_fields)
+    render json: {
+      error: "pickup_invalid",
+      missing_fields: missing_fields
+    }, status: :unprocessable_entity
   end
 
   def create_items(delivery, items_params)
