@@ -15,4 +15,8 @@ class BusinessTest < ActiveSupport::TestCase
     assert_not duplicate.valid?
     assert_includes duplicate.errors[:slug], "has already been taken"
   end
+
+  test "has api keys association" do
+    assert_respond_to businesses(:one), :api_keys
+  end
 end

@@ -46,4 +46,12 @@ class UserTest < ActiveSupport::TestCase
     assert user.admin?
     assert_not user.staff?
   end
+
+  test "tracks created and revoked api keys" do
+    user = users(:one)
+
+    assert_includes user.created_api_keys, api_keys(:active)
+    assert_includes user.created_api_keys, api_keys(:revoked)
+    assert_includes user.revoked_api_keys, api_keys(:revoked)
+  end
 end
