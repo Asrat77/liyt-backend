@@ -72,6 +72,106 @@ class DeliveriesControllerTest < ActionDispatch::IntegrationTest
     assert_equal api_keys(:active).id, created_event.actor_id
   end
 
+  test "creates a delivery with business defaults when pickup is omitted" do
+    BusinessSetting.create!(
+      business: @business,
+      pickup_address1: "Default Pickup St",
+      pickup_city: "Addis Ababa",
+      pickup_region: "Addis Ababa",
+      pickup_country_code: "ET",
+      pickup_contact_name: "Default Sender",
+      pickup_contact_phone: "+251900000000",
+      pickup_instructions: "Ring back door"
+    )
+
+    params = delivery_create_params.except(:pickup)
+
+    assert_difference("Delivery.count") do
+      post deliveries_path,
+        headers: api_key_header(@active_api_key),
+        params: params
+    end
+
+    assert_response :created
+    body = JSON.parse(response.body)
+    pickup = body["stops"].find { |stop| stop["kind"] == "pickup" }
+
+    assert_equal "Default Pickup St", pickup["address1"]
+    assert_equal "Default Sender", pickup["contact_name"]
+    assert_equal "Ring back door", pickup["instructions"]
+  end
+
+  test "uses request pickup values over defaults" do
+    BusinessSetting.create!(
+      business: @business,
+      pickup_address1: "Default Pickup St",
+      pickup_city: "Addis Ababa",
+      pickup_region: "Addis Ababa",
+      pickup_country_code: "ET",
+      pickup_contact_name: "Default Sender",
+      pickup_contact_phone: "+251900000000",
+      pickup_instructions: "Default instructions"
+    )
+
+    params = delivery_create_params
+    params[:pickup][:address1] = "Request Pickup St"
+    params[:pickup][:contact_name] = "Request Sender"
+
+    post deliveries_path,
+      headers: api_key_header(@active_api_key),
+      params: params
+
+    assert_response :created
+    body = JSON.parse(response.body)
+    pickup = body["stops"].find { |stop| stop["kind"] == "pickup" }
+
+    assert_equal "Request Pickup St", pickup["address1"]
+    assert_equal "Request Sender", pickup["contact_name"]
+    assert_equal "Default instructions", pickup["instructions"]
+  end
+
+  test "creates a delivery by merging partial pickup with defaults" do
+    BusinessSetting.create!(
+      business: @business,
+      pickup_address1: "Default Pickup St",
+      pickup_city: "Addis Ababa",
+      pickup_region: "Addis Ababa",
+      pickup_country_code: "ET",
+      pickup_contact_name: "Default Sender",
+      pickup_contact_phone: "+251900000000"
+    )
+
+    params = delivery_create_params
+    params[:pickup] = { address1: "Partial Pickup St" }
+
+    post deliveries_path,
+      headers: api_key_header(@active_api_key),
+      params: params
+
+    assert_response :created
+    body = JSON.parse(response.body)
+    pickup = body["stops"].find { |stop| stop["kind"] == "pickup" }
+
+    assert_equal "Partial Pickup St", pickup["address1"]
+    assert_equal "Addis Ababa", pickup["city"]
+    assert_equal "+251900000000", pickup["contact_phone"]
+  end
+
+  test "returns unprocessable entity when pickup is unresolved and defaults are missing" do
+    params = delivery_create_params.except(:pickup)
+
+    assert_no_difference("Delivery.count") do
+      post deliveries_path,
+        headers: api_key_header(@active_api_key),
+        params: params
+    end
+
+    assert_response :unprocessable_entity
+    body = JSON.parse(response.body)
+
+    assert_equal "pickup_invalid", body["error"]
+  end
+
   test "returns unauthorized when api key is missing for delivery create" do
     post deliveries_path, params: delivery_create_params
 
