@@ -1914,6 +1914,316 @@
       ]
     },
     {
+      "name": "Customers Auth",
+      "item": [
+        {
+          "name": "Create Customer Registration",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/customers/registrations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "customers",
+                "registrations"
+              ]
+            },
+            "description": "Customer sign up for an existing business. Public.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"business_id\": 1,\n  \"email\": \"customer@abay.et\",\n  \"password\": \"Password123!\",\n  \"full_name\": \"Meron Bekele\",\n  \"phone\": \"+251911223344\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is one of expected outcomes\", function () {",
+                  "  pm.expect([201, 422]).to.include(pm.response.code);",
+                  "});",
+                  "pm.test(\"Registration success payload for 201\", function () {",
+                  "  if (pm.response.code !== 201) return;",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property('access_token');",
+                  "  pm.expect(json).to.have.property('refresh_token');",
+                  "  pm.expect(json).to.have.property('token_type', 'Bearer');",
+                  "  pm.expect(json).to.have.property('user');",
+                  "  pm.expect(json.user).to.have.property('email');",
+                  "  pm.expect(json.user).to.have.property('business_id');",
+                  "  pm.expect(json).to.have.property('roles');",
+                  "  pm.expect(json.roles).to.include('customer');",
+                  "});",
+                  "pm.test(\"Registration validation payload for 422\", function () {",
+                  "  if (pm.response.code !== 422) return;",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property('error', 'registration_invalid');",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Customer Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/customers/sessions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "customers",
+                "sessions"
+              ]
+            },
+            "description": "Customer sign in. Public.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"customer@abay.et\",\n  \"password\": \"Password123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is one of expected outcomes\", function () {",
+                  "  pm.expect([201, 401]).to.include(pm.response.code);",
+                  "});",
+                  "pm.test(\"Session success payload for 201\", function () {",
+                  "  if (pm.response.code !== 201) return;",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property('access_token');",
+                  "  pm.expect(json).to.have.property('refresh_token');",
+                  "  pm.expect(json).to.have.property('token_type', 'Bearer');",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Refresh Customer Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/customers/sessions/refresh",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "customers",
+                "sessions",
+                "refresh"
+              ]
+            },
+            "description": "Refresh customer token. Public.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"paste_customer_refresh_token_here\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is one of expected outcomes\", function () {",
+                  "  pm.expect([200, 401]).to.include(pm.response.code);",
+                  "});",
+                  "pm.test(\"Refresh success payload for 200\", function () {",
+                  "  if (pm.response.code !== 200) return;",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property('access_token');",
+                  "  pm.expect(json).to.have.property('refresh_token');",
+                  "  pm.expect(json).to.have.property('roles');",
+                  "  pm.expect(json.roles).to.include('customer');",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Revoke Customer Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/customers/sessions/revoke",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "customers",
+                "sessions",
+                "revoke"
+              ]
+            },
+            "description": "Revoke customer refresh token family. Public.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"paste_customer_refresh_token_here\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is one of expected outcomes\", function () {",
+                  "  pm.expect([204, 401, 404]).to.include(pm.response.code);",
+                  "});",
+                  "pm.test(\"No content on successful revoke\", function () {",
+                  "  if (pm.response.code !== 204) return;",
+                  "  pm.expect(pm.response.text()).to.eql('');",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Customer Me",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/customers/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "customers",
+                "me"
+              ]
+            },
+            "description": "Current customer user profile. Bearer required."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is one of expected outcomes\", function () {",
+                  "  pm.expect([200, 401]).to.include(pm.response.code);",
+                  "});",
+                  "pm.test(\"Profile payload for 200\", function () {",
+                  "  if (pm.response.code !== 200) return;",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property('id');",
+                  "  pm.expect(json).to.have.property('email');",
+                  "  pm.expect(json).to.have.property('business_id');",
+                  "  pm.expect(json).to.have.property('roles');",
+                  "  pm.expect(json.roles).to.include('customer');",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "Customers Confirmation",
       "item": [
         {

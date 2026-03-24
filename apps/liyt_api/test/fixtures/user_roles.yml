@@ -7,3 +7,7 @@ one_admin:
 two_staff:
   user: two
   role: staff
+
+customer_one_customer:
+  user: customer_one
+  role: customer_one

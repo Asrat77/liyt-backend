@@ -36,6 +36,37 @@ curl -sS -X POST "https://YOUR_DOMAIN/drivers/sessions" \
   -d '{"email":"driver@ride.test","password":"password"}'
 ```
 
+### Customer registration
+
+```bash
+curl -sS -X POST "https://YOUR_DOMAIN/customers/registrations" \
+  -H "Content-Type: application/json" \
+  -d '{"business_id":1,"email":"customer@acme.test","password":"password","full_name":"John Doe","phone":"+251911111111"}'
+```
+
+### Customer login
+
+```bash
+curl -sS -X POST "https://YOUR_DOMAIN/customers/sessions" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"customer@acme.test","password":"password"}'
+```
+
+### Customer token refresh
+
+```bash
+curl -sS -X POST "https://YOUR_DOMAIN/customers/sessions/refresh" \
+  -H "Content-Type: application/json" \
+  -d '{"refresh_token":"<CUSTOMER_REFRESH_TOKEN>"}'
+```
+
+### Customer profile
+
+```bash
+curl -sS -X GET "https://YOUR_DOMAIN/customers/me" \
+  -H "Authorization: Bearer <CUSTOMER_TOKEN>"
+```
+
 ## Delivery Flow
 
 ### 1. Business creates delivery
@@ -122,7 +153,7 @@ Optional account bootstrap during confirmation:
 
 - Include both `email` and `password` in the confirm request to provision (or resolve) a user account and assign the `customer` role for that delivery business.
 - If `password` is omitted, confirmation still works (legacy behavior).
-- Customer signin remains the standard staff/customer path: `POST /auth/sessions` with `email` and `password`.
+- Customer signin can use `POST /customers/sessions` with `email` and `password`.
 
 ### 3. Driver views available deliveries
 

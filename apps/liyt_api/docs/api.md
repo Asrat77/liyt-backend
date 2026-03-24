@@ -244,6 +244,109 @@ This document lists all routes defined in `apps/liyt_api/config/routes.rb`, with
 }
 ```
 
+## Customers
+
+### POST /customers/sessions
+
+- Controller: `Customers::SessionsController#create`
+- Auth: not required
+- Body:
+  - `email` (string, required)
+  - `password` (string, required)
+- Restrictions:
+  - Account must have `customer` role
+- Responses:
+  - 201 Created: token response
+  - 401 Unauthorized: invalid credentials, unknown email, or missing customer role
+
+### POST /customers/sessions/refresh
+
+- Controller: `Customers::SessionsController#refresh`
+- Auth: not required
+- Body:
+  - `refresh_token` (string, required)
+- Restrictions:
+  - Token must exist and belong to a User with `customer` role
+  - Token must not be expired or revoked
+  - If expired or revoked, the entire token family is revoked
+- Responses:
+  - 200 OK: token response plus roles
+  - 401 Unauthorized: missing token, unknown token, wrong owner type, non-customer owner, expired token, or revoked token
+- Response body:
+```json
+{
+  "access_token": "<jwt>",
+  "refresh_token": "<opaque>",
+  "token_type": "Bearer",
+  "expires_in": 900,
+  "roles": ["customer"]
+}
+```
+
+### POST /customers/sessions/revoke
+
+- Controller: `Customers::SessionsController#revoke`
+- Auth: not required
+- Body:
+  - `refresh_token` (string, required)
+- Restrictions:
+  - Token must exist and belong to a User with `customer` role
+  - Revokes the entire token family
+- Responses:
+  - 204 No Content: token family revoked
+  - 401 Unauthorized: missing token
+  - 404 Not Found: token not found or token does not belong to a customer user
+
+### POST /customers/registrations
+
+- Controller: `Customers::RegistrationsController#create`
+- Auth: not required
+- Body:
+  - `business_id` (integer, required)
+  - `email` (string, required)
+  - `password` (string, required)
+  - `full_name` (string, optional)
+  - `phone` (string, optional)
+- Flow:
+  - Resolve business by `business_id`
+  - Create user for that business
+  - Ensure customer role exists for that business
+  - Assign customer role to the user
+  - Issue access and refresh tokens
+- Responses:
+  - 201 Created: token response plus user and roles
+  - 422 Unprocessable Entity: invalid data, duplicate email, or invalid business
+- Response body:
+```json
+{
+  "access_token": "<jwt>",
+  "refresh_token": "<opaque>",
+  "token_type": "Bearer",
+  "expires_in": 900,
+  "user": { "id": 1, "email": "customer@example.test", "business_id": 1 },
+  "roles": ["customer"]
+}
+```
+
+### GET /customers/me
+
+- Controller: `Customers::MeController#show`
+- Auth: required (customer user token)
+- Restrictions:
+  - Current user must have `customer` role
+- Responses:
+  - 200 OK: current customer user info and roles
+  - 401 Unauthorized: missing/invalid token or non-customer user token
+- Response body:
+```json
+{
+  "id": 1,
+  "email": "customer@example.test",
+  "business_id": 1,
+  "roles": ["customer"]
+}
+```
+
 ## Business locations
 
 ### GET /business_locations
