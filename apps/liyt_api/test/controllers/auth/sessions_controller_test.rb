@@ -74,4 +74,34 @@ class Auth::SessionsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :unauthorized
   end
+
+  test "customer provisioned via confirmation can sign in and refresh with customer role" do
+    password = "password"
+    email = "confirmed-customer@example.com"
+
+    assert_difference [ "User.count", "Role.count", "UserRole.count" ], 1 do
+      post customers_confirmation_confirm_path, params: {
+        token: delivery_tracking_tokens(:token_one).token_hash,
+        full_name: "Confirmed Customer",
+        phone: "+251955555555",
+        email: email,
+        password: password
+      }
+    end
+
+    assert_response :ok
+
+    post auth_sessions_path, params: { email: email, password: password }
+
+    assert_response :created
+    signin_body = JSON.parse(response.body)
+    assert signin_body["access_token"].present?
+    assert signin_body["refresh_token"].present?
+
+    post refresh_auth_sessions_path, params: { refresh_token: signin_body["refresh_token"] }
+
+    assert_response :ok
+    refresh_body = JSON.parse(response.body)
+    assert_includes refresh_body["roles"], "customer"
+  end
 end
