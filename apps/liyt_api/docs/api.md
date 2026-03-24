@@ -302,20 +302,19 @@ This document lists all routes defined in `apps/liyt_api/config/routes.rb`, with
 - Controller: `Customers::RegistrationsController#create`
 - Auth: not required
 - Body:
-  - `business_id` (integer, required)
   - `email` (string, required)
   - `password` (string, required)
   - `full_name` (string, optional)
   - `phone` (string, optional)
 - Flow:
-  - Resolve business by `business_id`
+  - Resolve a server-managed business context (customers are not required to choose a business during signup)
   - Create user for that business
   - Ensure customer role exists for that business
   - Assign customer role to the user
   - Issue access and refresh tokens
 - Responses:
   - 201 Created: token response plus user and roles
-  - 422 Unprocessable Entity: invalid data, duplicate email, or invalid business
+  - 422 Unprocessable Entity: invalid data or duplicate email
 - Response body:
 ```json
 {

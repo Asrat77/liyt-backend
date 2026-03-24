@@ -41,7 +41,7 @@ curl -sS -X POST "https://YOUR_DOMAIN/drivers/sessions" \
 ```bash
 curl -sS -X POST "https://YOUR_DOMAIN/customers/registrations" \
   -H "Content-Type: application/json" \
-  -d '{"business_id":1,"email":"customer@acme.test","password":"password","full_name":"John Doe","phone":"+251911111111"}'
+  -d '{"email":"customer@acme.test","password":"password","full_name":"John Doe","phone":"+251911111111"}'
 ```
 
 ### Customer login

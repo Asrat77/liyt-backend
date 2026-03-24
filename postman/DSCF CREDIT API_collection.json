@@ -1940,7 +1940,7 @@
             "description": "Customer sign up for an existing business. Public.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"business_id\": 1,\n  \"email\": \"customer@abay.et\",\n  \"password\": \"Password123!\",\n  \"full_name\": \"Meron Bekele\",\n  \"phone\": \"+251911223344\"\n}",
+              "raw": "{\n  \"email\": \"customer@abay.et\",\n  \"password\": \"Password123!\",\n  \"full_name\": \"Meron Bekele\",\n  \"phone\": \"+251911223344\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1968,7 +1968,6 @@
                   "  pm.expect(json).to.have.property('token_type', 'Bearer');",
                   "  pm.expect(json).to.have.property('user');",
                   "  pm.expect(json.user).to.have.property('email');",
-                  "  pm.expect(json.user).to.have.property('business_id');",
                   "  pm.expect(json).to.have.property('roles');",
                   "  pm.expect(json.roles).to.include('customer');",
                   "});",

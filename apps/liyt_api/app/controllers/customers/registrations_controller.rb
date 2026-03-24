@@ -5,7 +5,7 @@ module Customers
     skip_before_action :authenticate_request, only: [ :create ]
 
     def create
-      business = Business.find(registration_params[:business_id])
+      business = registration_business
 
       user = nil
       ApplicationRecord.transaction do
@@ -30,7 +30,11 @@ module Customers
     private
 
     def registration_params
-      params.permit(:business_id, :email, :password, :full_name, :phone)
+      params.permit(:email, :password, :full_name, :phone)
+    end
+
+    def registration_business
+      Business.find_by(status: "active") || Business.order(:id).first!
     end
 
     def user_response(user)
