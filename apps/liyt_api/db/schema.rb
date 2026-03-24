@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_23_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_23_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -52,6 +52,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_23_120000) do
     t.datetime "updated_at", null: false
     t.index ["business_id", "active"], name: "index_business_locations_on_business_id_and_active"
     t.index ["business_id"], name: "index_business_locations_on_business_id"
+  end
+
+  create_table "business_settings", force: :cascade do |t|
+    t.bigint "business_id", null: false
+    t.string "pickup_address1"
+    t.string "pickup_address2"
+    t.string "pickup_city"
+    t.string "pickup_region"
+    t.string "pickup_postal_code"
+    t.string "pickup_country_code"
+    t.decimal "pickup_latitude", precision: 10, scale: 8
+    t.decimal "pickup_longitude", precision: 11, scale: 8
+    t.string "pickup_contact_name"
+    t.string "pickup_contact_phone"
+    t.text "pickup_instructions"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_id"], name: "index_business_settings_on_business_id", unique: true
   end
 
   create_table "businesses", force: :cascade do |t|
@@ -242,6 +260,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_23_120000) do
   end
 
   add_foreign_key "business_locations", "businesses"
+  add_foreign_key "business_settings", "businesses"
   add_foreign_key "api_keys", "businesses"
   add_foreign_key "api_keys", "users", column: "created_by_user_id"
   add_foreign_key "api_keys", "users", column: "revoked_by_user_id"

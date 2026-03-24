@@ -33,6 +33,7 @@ Rails.application.routes.draw do
   end
 
   resources :business_locations, only: [ :index, :show, :create, :update, :destroy ]
+  resource :business_settings, only: [ :show, :update ]
 
   resources :api_keys, only: [ :index, :show, :create ] do
     member do
