@@ -15,6 +15,14 @@ module Customers
           password: registration_params[:password]
         )
 
+        if registration_params[:full_name].present? && registration_params[:phone].present?
+          Customer.find_or_create_by!(email: user.email) do |customer|
+            customer.full_name = registration_params[:full_name]
+            customer.phone = registration_params[:phone]
+            customer.status = "active"
+          end
+        end
+
         customer_role = Role.find_or_create_by!(business: business, name: "customer")
         UserRole.create!(user: user, role: customer_role)
       end

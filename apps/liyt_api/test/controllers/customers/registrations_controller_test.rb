@@ -24,6 +24,11 @@ class Customers::RegistrationsControllerTest < ActionDispatch::IntegrationTest
     user = User.find_by(email: "new-customer@acme.test")
     assert_not_nil user
 
+    customer = Customer.find_by(email: "new-customer@acme.test")
+    assert_not_nil customer
+    assert_equal "New Customer", customer.full_name
+    assert_equal "+251911111111", customer.phone
+
     role = Role.find_by(business_id: assigned_business.id, name: "customer")
     assert_not_nil role
     assert UserRole.exists?(user: user, role: role)

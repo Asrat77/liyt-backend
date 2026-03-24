@@ -3,6 +3,13 @@ require "test_helper"
 class Customers::MeControllerTest < ActionDispatch::IntegrationTest
   setup do
     @customer = users(:customer_one)
+    @customer_profile = Customer.create!(
+      email: @customer.email,
+      full_name: "Customer One",
+      phone: "+251911223344",
+      status: "active"
+    )
+
     @customer_token = Infra::Jwt.encode({ "sub" => @customer.id, "biz" => @customer.business_id, "typ" => "user" })
 
     @non_customer = users(:one)
@@ -17,8 +24,8 @@ class Customers::MeControllerTest < ActionDispatch::IntegrationTest
 
     assert_equal @customer.id, body["id"]
     assert_equal @customer.email, body["email"]
-    assert_equal @customer.full_name, body["full_name"]
-    assert_equal @customer.phone, body["phone"]
+    assert_equal @customer_profile.full_name, body["full_name"]
+    assert_equal @customer_profile.phone, body["phone"]
     assert_equal @customer.business_id, body["business_id"]
     assert_includes body["roles"], "customer"
   end
