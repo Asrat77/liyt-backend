@@ -2206,6 +2206,8 @@
                   "  const json = pm.response.json();",
                   "  pm.expect(json).to.have.property('id');",
                   "  pm.expect(json).to.have.property('email');",
+                  "  pm.expect(json).to.have.property('full_name');",
+                  "  pm.expect(json).to.have.property('phone');",
                   "  pm.expect(json).to.have.property('business_id');",
                   "  pm.expect(json).to.have.property('roles');",
                   "  pm.expect(json.roles).to.include('customer');",

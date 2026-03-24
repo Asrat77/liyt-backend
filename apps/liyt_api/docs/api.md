@@ -341,6 +341,8 @@ This document lists all routes defined in `apps/liyt_api/config/routes.rb`, with
 {
   "id": 1,
   "email": "customer@example.test",
+  "full_name": "Customer One",
+  "phone": "+251911223344",
   "business_id": 1,
   "roles": ["customer"]
 }

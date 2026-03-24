@@ -17,6 +17,8 @@ class Customers::MeControllerTest < ActionDispatch::IntegrationTest
 
     assert_equal @customer.id, body["id"]
     assert_equal @customer.email, body["email"]
+    assert_equal @customer.full_name, body["full_name"]
+    assert_equal @customer.phone, body["phone"]
     assert_equal @customer.business_id, body["business_id"]
     assert_includes body["roles"], "customer"
   end
