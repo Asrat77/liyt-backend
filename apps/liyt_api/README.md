@@ -101,7 +101,7 @@ Example `422` when pickup data is incomplete and no defaults exist:
 curl -sS -X GET "https://YOUR_DOMAIN/customers/confirmation?token=<TOKEN_FROM_EMAIL>"
 
 # Confirm with dropoff location
-curl -sS -X POST "https://YOUR_DOMAIN/customers/confirmation" \
+curl -sS -X POST "https://YOUR_DOMAIN/customers/confirmation/confirm" \
   -H "Content-Type: application/json" \
   -d '{
     "token": "<TOKEN_FROM_EMAIL>",
@@ -117,6 +117,12 @@ curl -sS -X POST "https://YOUR_DOMAIN/customers/confirmation" \
     }
   }'
 ```
+
+Optional account bootstrap during confirmation:
+
+- Include both `email` and `password` in the confirm request to provision (or resolve) a user account and assign the `customer` role for that delivery business.
+- If `password` is omitted, confirmation still works (legacy behavior).
+- Customer signin remains the standard staff/customer path: `POST /auth/sessions` with `email` and `password`.
 
 ### 3. Driver views available deliveries
 

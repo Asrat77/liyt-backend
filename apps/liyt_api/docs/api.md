@@ -777,10 +777,11 @@ RBAC for key management:
 - Auth: not required
 - Body:
   - `token` (string, required): tracking token from email
-  - `full_name` (string, required): customer name
-  - `phone` (string, required): customer phone
+  - `full_name` (string, required when creating a new customer): customer name
+  - `phone` (string, required when creating a new customer): customer phone
   - `email` (string, optional): customer email
-  - `dropoff` (object, required) OR `location` (object, required):
+  - `password` (string, optional): when provided together with `email`, a sign-in user can be provisioned
+  - `dropoff` (object, optional) OR `location` (object, optional):
     - `address1` (string)
     - `address2` (string, optional)
     - `city` (string)
@@ -792,11 +793,21 @@ RBAC for key management:
     - `instructions` (string, optional)
     - `name` (string, optional): for saved location (e.g., "Home", "Office")
 - Flow:
-  - Find or create customer by phone/email
+  - Resolve customer:
+    - If `email` matches an existing customer, reuse it
+    - Otherwise create a customer from `full_name`/`phone`/`email`
+  - If both `email` and `password` are present:
+    - Create or resolve a `User` for the delivery business
+    - Ensure `customer` role exists for that business
+    - Assign `customer` role to the user (idempotent)
+  - If `password` is not provided, confirmation still succeeds (legacy confirmation remains valid)
   - Create customer location (if name provided)
-  - Create dropoff stop
+  - Create dropoff stop (when `dropoff` or `location` is provided)
   - Update delivery status to `pending`
   - Create delivery event
+- Sign-in after confirmation:
+  - Customer users authenticate via existing `POST /auth/sessions` with `email` and `password`
+  - No tokens are issued by confirmation itself
 - Responses:
   - 200 OK: delivery confirmed
   - 404 Not Found: token not found

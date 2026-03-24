@@ -97,11 +97,15 @@ class Auth::SessionsControllerTest < ActionDispatch::IntegrationTest
     signin_body = JSON.parse(response.body)
     assert signin_body["access_token"].present?
     assert signin_body["refresh_token"].present?
+    signin_payload = Infra::Jwt.decode(signin_body["access_token"])
+    assert_includes signin_payload["role"], "customer"
 
     post refresh_auth_sessions_path, params: { refresh_token: signin_body["refresh_token"] }
 
     assert_response :ok
     refresh_body = JSON.parse(response.body)
+    refresh_payload = Infra::Jwt.decode(refresh_body["access_token"])
+    assert_includes refresh_payload["role"], "customer"
     assert_includes refresh_body["roles"], "customer"
   end
 end
