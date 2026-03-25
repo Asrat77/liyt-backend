@@ -9,7 +9,7 @@ class BusinessSettingTest < ActiveSupport::TestCase
   end
 
   test "business has only one settings row" do
-    business = businesses(:one)
+    business = Business.create!(name: "Settings Test Biz", slug: "settings-test-biz")
     BusinessSetting.create!(business: business)
 
     duplicate = BusinessSetting.new(business: business)

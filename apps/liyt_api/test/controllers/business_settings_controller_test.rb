@@ -18,8 +18,8 @@ class BusinessSettingsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "shows current tenant business settings" do
-    BusinessSetting.create!(
-      business: @admin.business,
+    setting = BusinessSetting.find_or_initialize_by(business: @admin.business)
+    setting.update!(
       pickup_address1: "HQ Pickup",
       pickup_city: "Addis Ababa",
       pickup_region: "Addis Ababa",
@@ -75,8 +75,8 @@ class BusinessSettingsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "settings updates are tenant safe" do
-    other_setting = BusinessSetting.create!(
-      business: @other_tenant_user.business,
+    other_setting = BusinessSetting.find_or_initialize_by(business: @other_tenant_user.business)
+    other_setting.update!(
       pickup_address1: "Other Tenant Pickup",
       pickup_city: "Gondar",
       pickup_region: "Amhara",

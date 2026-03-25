@@ -10,6 +10,7 @@ class DeliveriesControllerTest < ActionDispatch::IntegrationTest
       "typ" => "user"
     })
     @business = @user.business
+    @business.business_setting&.destroy!
 
     @active_api_key = "a1b2c3d4e5f6.active-secret"
     @expired_api_key = "b1c2d3e4f5a6.expired-secret"
