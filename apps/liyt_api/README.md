@@ -2,6 +2,19 @@
 
 Rails 8 API app for LIYT. Lives inside `liyt-backend/apps/liyt_api`.
 
+## Local CI quality gates
+
+Run these from `liyt-backend/apps/liyt_api` to mirror CI checks:
+
+```bash
+bundle exec rubocop
+bundle exec brakeman -q -w2
+bundle exec bundle-audit check --update --database tmp/ruby-advisory-db
+bin/rails db:prepare
+bin/rails test
+BULLET_SERIAL_TESTS=1 bin/rails test test/integration/bullet_query_efficiency_test.rb
+```
+
 ## Auth endpoints
 
 ### Staff registration

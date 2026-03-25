@@ -6,6 +6,32 @@ on:
     branches: [ main, master ]
 
 jobs:
+  quality:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: apps/liyt_api
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.4.2
+          bundler-cache: true
+          working-directory: apps/liyt_api
+
+      - name: Run RuboCop
+        run: bundle exec rubocop
+
+      - name: Run Brakeman
+        run: bundle exec brakeman -q -w2
+
+      - name: Run dependency audit
+        run: bundle exec bundle-audit check --update --database tmp/ruby-advisory-db
+
   test:
     runs-on: ubuntu-latest
     services:
@@ -46,3 +72,45 @@ jobs:
 
       - name: Run tests
         run: bin/rails test
+
+  bullet:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: liyt_api_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    defaults:
+      run:
+        working-directory: apps/liyt_api
+
+    env:
+      RAILS_ENV: test
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/liyt_api_test
+      BULLET_SERIAL_TESTS: "1"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.4.2
+          bundler-cache: true
+          working-directory: apps/liyt_api
+
+      - name: Setup database
+        run: bin/rails db:prepare
+
+      - name: Run Bullet query efficiency tests
+        run: bin/rails test test/integration/bullet_query_efficiency_test.rb
