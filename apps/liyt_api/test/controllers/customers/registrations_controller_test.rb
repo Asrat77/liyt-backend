@@ -8,7 +8,7 @@ class Customers::RegistrationsControllerTest < ActionDispatch::IntegrationTest
       email: "new-customer@acme.test",
       password: "password",
       full_name: "New Customer",
-      phone: "+251911111111"
+      phone: "+251911111119"
     }
 
     assert_response :created
@@ -27,7 +27,7 @@ class Customers::RegistrationsControllerTest < ActionDispatch::IntegrationTest
     customer = Customer.find_by(email: "new-customer@acme.test")
     assert_not_nil customer
     assert_equal "New Customer", customer.full_name
-    assert_equal "+251911111111", customer.phone
+    assert_equal "+251911111119", customer.phone
 
     role = Role.find_by(business_id: assigned_business.id, name: "customer")
     assert_not_nil role

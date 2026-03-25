@@ -1,0 +1,17 @@
+one:
+  business: one
+  pickup_address1: "Warehouse One"
+  pickup_city: "Addis Ababa"
+  pickup_region: "Addis Ababa"
+  pickup_country_code: "ET"
+  pickup_contact_name: "Dispatch One"
+  pickup_contact_phone: "+251900000001"
+
+two:
+  business: two
+  pickup_address1: "Warehouse Two"
+  pickup_city: "Addis Ababa"
+  pickup_region: "Addis Ababa"
+  pickup_country_code: "ET"
+  pickup_contact_name: "Dispatch Two"
+  pickup_contact_phone: "+251900000002"

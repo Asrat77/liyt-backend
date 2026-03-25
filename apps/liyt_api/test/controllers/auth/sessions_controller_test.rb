@@ -106,14 +106,16 @@ class Auth::SessionsControllerTest < ActionDispatch::IntegrationTest
     password = "password"
     email = "confirmed-customer@example.com"
 
-    assert_difference [ "User.count", "Role.count", "UserRole.count" ], 1 do
-      post customers_confirmation_confirm_path, params: {
-        token: delivery_tracking_tokens(:token_one).token_hash,
-        full_name: "Confirmed Customer",
-        phone: "+251955555555",
-        email: email,
-        password: password
-      }
+    assert_no_difference "Role.count" do
+      assert_difference [ "User.count", "UserRole.count" ], 1 do
+        post customers_confirmation_confirm_path, params: {
+          token: delivery_tracking_tokens(:token_one).token_hash,
+          full_name: "Confirmed Customer",
+          phone: "+251955555555",
+          email: email,
+          password: password
+        }
+      end
     end
 
     assert_response :ok
