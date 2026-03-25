@@ -13,7 +13,10 @@ bundle exec bundle-audit check --update --database tmp/ruby-advisory-db
 bin/rails db:prepare
 bin/rails test
 ENABLE_BULLET=1 BULLET_SERIAL_TESTS=1 bin/rails test test/integration/bullet_query_efficiency_test.rb
+COVERAGE=1 bin/rails test
 ```
+
+Coverage reports are written to `apps/liyt_api/coverage/` when `COVERAGE=1` is set.
 
 ## Auth endpoints
 
