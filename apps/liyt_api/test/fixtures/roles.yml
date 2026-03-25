@@ -7,3 +7,7 @@ admin:
 staff:
   business: two
   name: staff
+
+customer_one:
+  business: one
+  name: customer

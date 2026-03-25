@@ -37,6 +37,7 @@ module Customers
 
       ApplicationRecord.transaction do
         customer = find_or_create_customer
+        assign_customer_signin_role(delivery)
         create_customer_location(customer) if confirmation_params[:location].present?
 
         delivery.update!(
@@ -94,6 +95,33 @@ module Customers
         phone: confirmation_params[:phone],
         email: confirmation_params[:email]
       )
+    end
+
+    def assign_customer_signin_role(delivery)
+      return unless confirmation_params[:email].present? && confirmation_params[:password].present?
+
+      user = find_or_create_customer_user(delivery)
+      role = Role.find_or_create_by!(business: delivery.business, name: "customer")
+
+      UserRole.find_or_create_by!(user: user, role: role)
+    end
+
+    def find_or_create_customer_user(delivery)
+      email = confirmation_params[:email].to_s.strip.downcase
+      user = User.find_by(email: email)
+
+      return User.create!(
+        business: delivery.business,
+        email: email,
+        password: confirmation_params[:password]
+      ) unless user
+
+      if user.business_id != delivery.business_id
+        user.errors.add(:business, "must match delivery business")
+        raise ActiveRecord::RecordInvalid, user
+      end
+
+      user
     end
 
     def create_customer_location(customer)

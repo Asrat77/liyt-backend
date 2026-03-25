@@ -50,4 +50,16 @@ Rails.application.configure do
 
   # Raise error when a before_action's only/except options reference missing actions.
   config.action_controller.raise_on_missing_callback_actions = true
+
+  config.after_initialize do
+    next unless defined?(Bullet)
+
+    Bullet.enable = true
+    Bullet.raise = true
+    Bullet.n_plus_one_query_enable = true
+    Bullet.unused_eager_loading_enable = false
+    Bullet.counter_cache_enable = false
+  end
+
+  config.middleware.use Bullet::Rack if defined?(Bullet)
 end

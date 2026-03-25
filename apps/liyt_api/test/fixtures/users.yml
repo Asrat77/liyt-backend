@@ -9,3 +9,8 @@ two:
   business: two
   email: staff@beta.test
   password_digest: <%= BCrypt::Password.create("password") %>
+
+customer_one:
+  business: one
+  email: customer@acme.test
+  password_digest: <%= BCrypt::Password.create("password") %>

@@ -2,6 +2,19 @@
 
 Rails 8 API app for LIYT. Lives inside `liyt-backend/apps/liyt_api`.
 
+## Local CI quality gates
+
+Run these from `liyt-backend/apps/liyt_api` to mirror CI checks:
+
+```bash
+bundle exec rubocop
+bundle exec brakeman -q -w2
+bundle exec bundle-audit check --update --database tmp/ruby-advisory-db
+bin/rails db:prepare
+bin/rails test
+BULLET_SERIAL_TESTS=1 bin/rails test test/integration/bullet_query_efficiency_test.rb
+```
+
 ## Auth endpoints
 
 ### Staff registration
@@ -34,6 +47,37 @@ curl -sS -X POST "https://YOUR_DOMAIN/drivers/registrations" \
 curl -sS -X POST "https://YOUR_DOMAIN/drivers/sessions" \
   -H "Content-Type: application/json" \
   -d '{"email":"driver@ride.test","password":"password"}'
+```
+
+### Customer registration
+
+```bash
+curl -sS -X POST "https://YOUR_DOMAIN/customers/registrations" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"customer@acme.test","password":"password","full_name":"John Doe","phone":"+251911111111"}'
+```
+
+### Customer login
+
+```bash
+curl -sS -X POST "https://YOUR_DOMAIN/customers/sessions" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"customer@acme.test","password":"password"}'
+```
+
+### Customer token refresh
+
+```bash
+curl -sS -X POST "https://YOUR_DOMAIN/customers/sessions/refresh" \
+  -H "Content-Type: application/json" \
+  -d '{"refresh_token":"<CUSTOMER_REFRESH_TOKEN>"}'
+```
+
+### Customer profile
+
+```bash
+curl -sS -X GET "https://YOUR_DOMAIN/customers/me" \
+  -H "Authorization: Bearer <CUSTOMER_TOKEN>"
 ```
 
 ## Delivery Flow
@@ -101,7 +145,7 @@ Example `422` when pickup data is incomplete and no defaults exist:
 curl -sS -X GET "https://YOUR_DOMAIN/customers/confirmation?token=<TOKEN_FROM_EMAIL>"
 
 # Confirm with dropoff location
-curl -sS -X POST "https://YOUR_DOMAIN/customers/confirmation" \
+curl -sS -X POST "https://YOUR_DOMAIN/customers/confirmation/confirm" \
   -H "Content-Type: application/json" \
   -d '{
     "token": "<TOKEN_FROM_EMAIL>",
@@ -117,6 +161,12 @@ curl -sS -X POST "https://YOUR_DOMAIN/customers/confirmation" \
     }
   }'
 ```
+
+Optional account bootstrap during confirmation:
+
+- Include both `email` and `password` in the confirm request to provision (or resolve) a user account and assign the `customer` role for that delivery business.
+- If `password` is omitted, confirmation still works (legacy behavior).
+- Customer signin can use `POST /customers/sessions` with `email` and `password`.
 
 ### 3. Driver views available deliveries
 

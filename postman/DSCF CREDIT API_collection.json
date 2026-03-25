@@ -1,0 +1,2392 @@
+{
+  "info": {
+    "name": "LIYT API",
+    "description": "Complete API collection for LIYT API generated from current routes and controllers.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Pre-request script (collection-level)",
+          "// Token is set via {{accessToken}} environment variable"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "accessToken",
+      "value": ""
+    },
+    {
+      "key": "apiKey",
+      "value": ""
+    },
+    {
+      "key": "trackingToken",
+      "value": "paste_tracking_token_hash_here"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Get Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/up",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "up"
+              ]
+            },
+            "description": "Health probe endpoint. Public.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Create Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/sessions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "sessions"
+              ]
+            },
+            "description": "User sign in. Public.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@abay.et\",\n  \"password\": \"Password123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Refresh Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/sessions/refresh",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "sessions",
+                "refresh"
+              ]
+            },
+            "description": "Refresh user token. Public.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"paste_refresh_token_here\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Revoke Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/sessions/revoke",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "sessions",
+                "revoke"
+              ]
+            },
+            "description": "Revoke user refresh token family. Public.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"paste_refresh_token_here\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 204\", function () {",
+                  "  pm.response.to.have.status(204);",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Registration",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/registrations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "registrations"
+              ]
+            },
+            "description": "Create business + first admin. Public.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"business_name\": \"Abay Trading PLC\",\n  \"support_email\": \"support@abay.et\",\n  \"email\": \"admin@abay.et\",\n  \"password\": \"Password123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Me by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
+            },
+            "description": "Current user profile. Bearer required."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Drivers Auth",
+      "item": [
+        {
+          "name": "Create Driver Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/drivers/sessions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "drivers",
+                "sessions"
+              ]
+            },
+            "description": "Driver sign in. Public.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"driver1@liyt.et\",\n  \"password\": \"Password123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Refresh Driver Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/drivers/sessions/refresh",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "drivers",
+                "sessions",
+                "refresh"
+              ]
+            },
+            "description": "Driver token refresh. Public.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"paste_driver_refresh_token_here\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Revoke Driver Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/drivers/sessions/revoke",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "drivers",
+                "sessions",
+                "revoke"
+              ]
+            },
+            "description": "Driver token revoke. Public.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"paste_driver_refresh_token_here\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 204\", function () {",
+                  "  pm.response.to.have.status(204);",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Driver Registration",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/drivers/registrations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "drivers",
+                "registrations"
+              ]
+            },
+            "description": "Driver sign up. Public.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"driver2@liyt.et\",\n  \"password\": \"Password123!\",\n  \"full_name\": \"Bekele Tadesse\",\n  \"phone\": \"+251911223344\",\n  \"vehicle_type\": \"motorbike\",\n  \"license_number\": \"AA-1234567\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Driver Me by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/drivers/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "drivers",
+                "me"
+              ]
+            },
+            "description": "Current driver profile. Bearer required."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Driver Deliveries",
+      "item": [
+        {
+          "name": "List Driver Deliveries",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/drivers/deliveries",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "drivers",
+                "deliveries"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "per_page",
+                  "value": "20",
+                  "disabled": true
+                },
+                {
+                  "key": "order_by",
+                  "value": "created_at",
+                  "disabled": true
+                },
+                {
+                  "key": "order_direction",
+                  "value": "desc",
+                  "disabled": true
+                },
+                {
+                  "key": "q[status_eq]",
+                  "value": "pending",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Driver delivery list. Bearer required."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Driver Delivery by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/drivers/deliveries/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "drivers",
+                "deliveries",
+                "1"
+              ]
+            },
+            "description": "Driver delivery details. Bearer required."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Accept Driver Delivery",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/drivers/deliveries/1/accept",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "drivers",
+                "deliveries",
+                "1",
+                "accept"
+              ]
+            },
+            "description": "Accept pending delivery. Bearer required.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Pickup Driver Delivery",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/drivers/deliveries/1/pickup",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "drivers",
+                "deliveries",
+                "1",
+                "pickup"
+              ]
+            },
+            "description": "Pickup accepted delivery. Bearer required.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Complete Driver Delivery",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/drivers/deliveries/1/complete",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "drivers",
+                "deliveries",
+                "1",
+                "complete"
+              ]
+            },
+            "description": "Complete picked up delivery. Bearer required.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Business Locations",
+      "item": [
+        {
+          "name": "List Business Locations",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/business_locations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "business_locations"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "per_page",
+                  "value": "20",
+                  "disabled": true
+                },
+                {
+                  "key": "order_by",
+                  "value": "created_at",
+                  "disabled": true
+                },
+                {
+                  "key": "order_direction",
+                  "value": "desc",
+                  "disabled": true
+                },
+                {
+                  "key": "q[status_eq]",
+                  "value": "pending",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Tenant location list. Bearer required."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Business Location by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/business_locations/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "business_locations",
+                "1"
+              ]
+            },
+            "description": "Tenant location details. Bearer required."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Business Location",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/business_locations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "business_locations"
+              ]
+            },
+            "description": "Create business location. Bearer admin required.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Merkato Warehouse\",\n  \"address1\": \"Mercato Sefera\",\n  \"address2\": \"Near Teklehaimanot\",\n  \"city\": \"Addis Ababa\",\n  \"region\": \"Addis Ababa\",\n  \"postal_code\": \"1000\",\n  \"country_code\": \"ET\",\n  \"latitude\": 9.0347,\n  \"longitude\": 38.7469,\n  \"instructions\": \"Use loading gate 2\",\n  \"active\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Business Location",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/business_locations/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "business_locations",
+                "1"
+              ]
+            },
+            "description": "Patch business location. Bearer admin required.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Bole Dispatch Hub\",\n  \"city\": \"Addis Ababa\",\n  \"active\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Replace Business Location",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/business_locations/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "business_locations",
+                "1"
+              ]
+            },
+            "description": "Put business location. Bearer admin required.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Bole Dispatch Hub\",\n  \"address1\": \"Bole Medhanialem\",\n  \"address2\": \"Behind Friendship\",\n  \"city\": \"Addis Ababa\",\n  \"region\": \"Addis Ababa\",\n  \"postal_code\": \"1000\",\n  \"country_code\": \"ET\",\n  \"latitude\": 8.997,\n  \"longitude\": 38.786,\n  \"instructions\": \"Call security desk\",\n  \"active\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Business Location",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/business_locations/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "business_locations",
+                "1"
+              ]
+            },
+            "description": "Delete business location. Bearer admin required."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 204\", function () {",
+                  "  pm.response.to.have.status(204);",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Business Settings",
+      "item": [
+        {
+          "name": "Get Business Settings by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/business_settings",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "business_settings"
+              ]
+            },
+            "description": "Show settings. Bearer required."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Business Settings",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/business_settings",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "business_settings"
+              ]
+            },
+            "description": "Patch settings. Bearer admin required.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pickup_address1\": \"CMC Road\",\n  \"pickup_address2\": \"Opposite St. Michael\",\n  \"pickup_city\": \"Addis Ababa\",\n  \"pickup_region\": \"Addis Ababa\",\n  \"pickup_postal_code\": \"1000\",\n  \"pickup_country_code\": \"ET\",\n  \"pickup_latitude\": 9.03,\n  \"pickup_longitude\": 38.79,\n  \"pickup_contact_name\": \"Dispatch Desk\",\n  \"pickup_contact_phone\": \"+251911000111\",\n  \"pickup_instructions\": \"Arrive before noon\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Replace Business Settings",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/business_settings",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "business_settings"
+              ]
+            },
+            "description": "Put settings. Bearer admin required.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pickup_address1\": \"Sarbet Ring Road\",\n  \"pickup_address2\": \"Near Petrol Station\",\n  \"pickup_city\": \"Addis Ababa\",\n  \"pickup_region\": \"Addis Ababa\",\n  \"pickup_postal_code\": \"1000\",\n  \"pickup_country_code\": \"ET\",\n  \"pickup_latitude\": 9.01,\n  \"pickup_longitude\": 38.75,\n  \"pickup_contact_name\": \"Warehouse Lead\",\n  \"pickup_contact_phone\": \"+251922334455\",\n  \"pickup_instructions\": \"Use side entrance\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Api Keys",
+      "item": [
+        {
+          "name": "List Api Keys",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api_keys",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api_keys"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "per_page",
+                  "value": "20",
+                  "disabled": true
+                },
+                {
+                  "key": "order_by",
+                  "value": "created_at",
+                  "disabled": true
+                },
+                {
+                  "key": "order_direction",
+                  "value": "desc",
+                  "disabled": true
+                },
+                {
+                  "key": "q[status_eq]",
+                  "value": "pending",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "List API keys. Bearer staff/admin required."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Api Key by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api_keys/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api_keys",
+                "1"
+              ]
+            },
+            "description": "Get API key details. Bearer staff/admin required."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Api Key",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api_keys",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api_keys"
+              ]
+            },
+            "description": "Create API key. Bearer admin required.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Warehouse Integration Key\",\n  \"expires_at\": \"2026-12-31T23:59:59Z\",\n  \"scopes\": [\n    \"deliveries:write\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Revoke Api Key",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api_keys/1/revoke",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api_keys",
+                "1",
+                "revoke"
+              ]
+            },
+            "description": "Revoke API key. Bearer admin required.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Rotate Api Key",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api_keys/1/rotate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api_keys",
+                "1",
+                "rotate"
+              ]
+            },
+            "description": "Rotate API key. Bearer admin required.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Warehouse Integration Key Rotated\",\n  \"expires_at\": \"2027-12-31T23:59:59Z\",\n  \"scopes\": [\n    \"deliveries:write\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Deliveries",
+      "item": [
+        {
+          "name": "List Deliveries",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/deliveries",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "deliveries"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "per_page",
+                  "value": "20",
+                  "disabled": true
+                },
+                {
+                  "key": "order_by",
+                  "value": "created_at",
+                  "disabled": true
+                },
+                {
+                  "key": "order_direction",
+                  "value": "desc",
+                  "disabled": true
+                },
+                {
+                  "key": "q[status_eq]",
+                  "value": "pending",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "pending",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Tenant delivery list. Bearer required."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Delivery by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/deliveries/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "deliveries",
+                "1"
+              ]
+            },
+            "description": "Tenant delivery details. Bearer required."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Delivery",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text",
+                "disabled": true,
+                "description": "Use for user JWT auth"
+              },
+              {
+                "key": "X-API-Key",
+                "value": "{{apiKey}}",
+                "type": "text",
+                "description": "Use for API key auth"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/deliveries",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "deliveries"
+              ]
+            },
+            "description": "Create delivery. Either Bearer admin or X-API-Key deliveries:write.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"10 cartons of edible oil for retail branch\",\n  \"price\": 1800,\n  \"recipient_email\": \"recipient@addisretail.et\",\n  \"pickup\": {\n    \"address1\": \"Gurd Shola Warehouse\",\n    \"address2\": \"Block B\",\n    \"city\": \"Addis Ababa\",\n    \"region\": \"Addis Ababa\",\n    \"postal_code\": \"1000\",\n    \"country_code\": \"ET\",\n    \"latitude\": 9.01,\n    \"longitude\": 38.8,\n    \"contact_name\": \"Store Keeper\",\n    \"contact_phone\": \"+251933445566\",\n    \"instructions\": \"Call before arrival\"\n  },\n  \"items\": [\n    {\n      \"name\": \"Edible Oil Carton\",\n      \"quantity\": 10\n    },\n    {\n      \"name\": \"Sugar 5kg Bag\",\n      \"quantity\": 6\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cancel Delivery",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/deliveries/1/cancel",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "deliveries",
+                "1",
+                "cancel"
+              ]
+            },
+            "description": "Cancel delivery. Bearer admin required.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Customer requested cancellation\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 204\", function () {",
+                  "  pm.response.to.have.status(204);",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Customers Auth",
+      "item": [
+        {
+          "name": "Create Customer Registration",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/customers/registrations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "customers",
+                "registrations"
+              ]
+            },
+            "description": "Customer sign up for an existing business. Public.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"customer@abay.et\",\n  \"password\": \"Password123!\",\n  \"full_name\": \"Meron Bekele\",\n  \"phone\": \"+251911223344\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is one of expected outcomes\", function () {",
+                  "  pm.expect([201, 422]).to.include(pm.response.code);",
+                  "});",
+                  "pm.test(\"Registration success payload for 201\", function () {",
+                  "  if (pm.response.code !== 201) return;",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property('access_token');",
+                  "  pm.expect(json).to.have.property('refresh_token');",
+                  "  pm.expect(json).to.have.property('token_type', 'Bearer');",
+                  "  pm.expect(json).to.have.property('user');",
+                  "  pm.expect(json.user).to.have.property('email');",
+                  "  pm.expect(json).to.have.property('roles');",
+                  "  pm.expect(json.roles).to.include('customer');",
+                  "});",
+                  "pm.test(\"Registration validation payload for 422\", function () {",
+                  "  if (pm.response.code !== 422) return;",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property('error', 'registration_invalid');",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Customer Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/customers/sessions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "customers",
+                "sessions"
+              ]
+            },
+            "description": "Customer sign in. Public.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"customer@abay.et\",\n  \"password\": \"Password123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is one of expected outcomes\", function () {",
+                  "  pm.expect([201, 401]).to.include(pm.response.code);",
+                  "});",
+                  "pm.test(\"Session success payload for 201\", function () {",
+                  "  if (pm.response.code !== 201) return;",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property('access_token');",
+                  "  pm.expect(json).to.have.property('refresh_token');",
+                  "  pm.expect(json).to.have.property('token_type', 'Bearer');",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Refresh Customer Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/customers/sessions/refresh",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "customers",
+                "sessions",
+                "refresh"
+              ]
+            },
+            "description": "Refresh customer token. Public.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"paste_customer_refresh_token_here\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is one of expected outcomes\", function () {",
+                  "  pm.expect([200, 401]).to.include(pm.response.code);",
+                  "});",
+                  "pm.test(\"Refresh success payload for 200\", function () {",
+                  "  if (pm.response.code !== 200) return;",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property('access_token');",
+                  "  pm.expect(json).to.have.property('refresh_token');",
+                  "  pm.expect(json).to.have.property('roles');",
+                  "  pm.expect(json.roles).to.include('customer');",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Revoke Customer Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/customers/sessions/revoke",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "customers",
+                "sessions",
+                "revoke"
+              ]
+            },
+            "description": "Revoke customer refresh token family. Public.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"paste_customer_refresh_token_here\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is one of expected outcomes\", function () {",
+                  "  pm.expect([204, 401, 404]).to.include(pm.response.code);",
+                  "});",
+                  "pm.test(\"No content on successful revoke\", function () {",
+                  "  if (pm.response.code !== 204) return;",
+                  "  pm.expect(pm.response.text()).to.eql('');",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Customer Me",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/customers/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "customers",
+                "me"
+              ]
+            },
+            "description": "Current customer user profile. Bearer required."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is one of expected outcomes\", function () {",
+                  "  pm.expect([200, 401]).to.include(pm.response.code);",
+                  "});",
+                  "pm.test(\"Profile payload for 200\", function () {",
+                  "  if (pm.response.code !== 200) return;",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property('id');",
+                  "  pm.expect(json).to.have.property('email');",
+                  "  pm.expect(json).to.have.property('full_name');",
+                  "  pm.expect(json).to.have.property('phone');",
+                  "  pm.expect(json).to.have.property('business_id');",
+                  "  pm.expect(json).to.have.property('roles');",
+                  "  pm.expect(json.roles).to.include('customer');",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Customers Confirmation",
+      "item": [
+        {
+          "name": "Show Customer Confirmation",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/customers/confirmation",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "customers",
+                "confirmation"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{trackingToken}}"
+                }
+              ]
+            },
+            "description": "Load confirmation details by token. Public.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Confirm Customer Confirmation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/customers/confirmation/confirm",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "customers",
+                "confirmation",
+                "confirm"
+              ]
+            },
+            "description": "Confirm recipient details. Public. Legacy flow works without password. When both email and password are provided, the API provisions or reuses a User and assigns the customer role for the delivery business.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"{{trackingToken}}\",\n  \"full_name\": \"Meseret Alemu\",\n  \"phone\": \"+251944556677\",\n  \"email\": \"meseret.alemu@example.com\",\n  \"password\": \"Cust0mer!123\",\n  \"dropoff\": {\n    \"address1\": \"Kazanchis Condominium\",\n    \"address2\": \"Building C\",\n    \"city\": \"Addis Ababa\",\n    \"region\": \"Addis Ababa\",\n    \"postal_code\": \"1000\",\n    \"country_code\": \"ET\",\n    \"latitude\": 8.99,\n    \"longitude\": 38.77,\n    \"instructions\": \"Leave with front desk\"\n  },\n  \"location\": {\n    \"name\": \"Home\",\n    \"address1\": \"Kazanchis Condominium\",\n    \"address2\": \"Building C\",\n    \"city\": \"Addis Ababa\",\n    \"region\": \"Addis Ababa\",\n    \"postal_code\": \"1000\",\n    \"country_code\": \"ET\",\n    \"latitude\": 8.99,\n    \"longitude\": 38.77,\n    \"instructions\": \"Use elevator 2\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is one of expected outcomes\", function () {",
+                  "  pm.expect([200, 404, 410, 422]).to.include(pm.response.code);",
+                  "});",
+                  "pm.test(\"Success response shape for 200\", function () {",
+                  "  if (pm.response.code !== 200) return;",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property('message');",
+                  "  pm.expect(json).to.have.property('delivery');",
+                  "  pm.expect(json.delivery).to.have.property('public_id');",
+                  "  pm.expect(json.delivery).to.have.property('status', 'pending');",
+                  "  pm.expect(json.delivery).to.have.property('tracking_url');",
+                  "});",
+                  "pm.test(\"Validation and state errors for 422\", function () {",
+                  "  if (pm.response.code !== 422) return;",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.be.an('object');",
+                  "  pm.expect(['already_confirmed', 'confirmation_failed']).to.include(json.error);",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tracking",
+      "item": [
+        {
+          "name": "Get Tracking by Token",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/track/{{trackingToken}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "track",
+                "{{trackingToken}}"
+              ]
+            },
+            "description": "Public delivery tracking endpoint.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Body is JSON when present', function () {",
+                  "  if (pm.response.text().trim().length > 0) {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

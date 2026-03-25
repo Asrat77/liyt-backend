@@ -1,4 +1,4 @@
-module Auth
+module Customers
   class SessionsController < ApplicationController
     include TokenIssuer
 
@@ -7,6 +7,7 @@ module Auth
     def create
       user = User.find_by!(email: params[:email])
       return head(:unauthorized) unless user.authenticate(params[:password])
+      return head(:unauthorized) unless customer?(user)
 
       render json: issue_tokens(user, user_payload(user)), status: :created
     rescue ActiveRecord::RecordNotFound
@@ -21,6 +22,7 @@ module Auth
       refresh_token = RefreshToken.find_by(token_hash: token_hash)
       return head(:unauthorized) unless refresh_token
       return head(:unauthorized) unless refresh_token.owner_type == "User"
+      return head(:unauthorized) unless customer?(refresh_token.owner)
 
       if refresh_token.revoked? || refresh_token.expired?
         refresh_token.revoke_family!
@@ -42,9 +44,17 @@ module Auth
       token_hash = Infra::TokenHashing.digest(token)
       refresh_token = RefreshToken.find_by(token_hash: token_hash)
       return head(:not_found) unless refresh_token
+      return head(:not_found) unless refresh_token.owner_type == "User"
+      return head(:not_found) unless customer?(refresh_token.owner)
 
       refresh_token.revoke_family!
       head :no_content
+    end
+
+    private
+
+    def customer?(user)
+      user.roles.where(name: "customer").exists?
     end
   end
 end

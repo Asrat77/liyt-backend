@@ -19,6 +19,14 @@ class BusinessLocationsControllerTest < ActionDispatch::IntegrationTest
     assert_equal @location.id, body.first["id"]
   end
 
+  test "rejects malformed authorization headers when listing locations" do
+    [ "Bearer ", "Bearer", "Token abc123", "Bearer invalid.jwt" ].each do |header|
+      get business_locations_path, headers: { "Authorization" => header }
+
+      assert_response :unauthorized
+    end
+  end
+
   test "creates a business location for admins" do
     post business_locations_path,
       params: { name: "New Depot", country_code: "US" },
@@ -50,6 +58,17 @@ class BusinessLocationsControllerTest < ActionDispatch::IntegrationTest
 
   test "prevents access to other tenant locations" do
     get business_location_path(@location), headers: auth_header(@staff_token)
+
+    assert_response :not_found
+  end
+
+  test "returns not found when other tenant admin updates a location" do
+    cross_tenant_admin_role = Role.create!(business: @staff.business, name: "admin")
+    UserRole.create!(user: @staff, role: cross_tenant_admin_role)
+
+    patch business_location_path(@location),
+      params: { city: "Nope" },
+      headers: auth_header(@staff_token)
 
     assert_response :not_found
   end

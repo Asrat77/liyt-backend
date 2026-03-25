@@ -244,6 +244,110 @@ This document lists all routes defined in `apps/liyt_api/config/routes.rb`, with
 }
 ```
 
+## Customers
+
+### POST /customers/sessions
+
+- Controller: `Customers::SessionsController#create`
+- Auth: not required
+- Body:
+  - `email` (string, required)
+  - `password` (string, required)
+- Restrictions:
+  - Account must have `customer` role
+- Responses:
+  - 201 Created: token response
+  - 401 Unauthorized: invalid credentials, unknown email, or missing customer role
+
+### POST /customers/sessions/refresh
+
+- Controller: `Customers::SessionsController#refresh`
+- Auth: not required
+- Body:
+  - `refresh_token` (string, required)
+- Restrictions:
+  - Token must exist and belong to a User with `customer` role
+  - Token must not be expired or revoked
+  - If expired or revoked, the entire token family is revoked
+- Responses:
+  - 200 OK: token response plus roles
+  - 401 Unauthorized: missing token, unknown token, wrong owner type, non-customer owner, expired token, or revoked token
+- Response body:
+```json
+{
+  "access_token": "<jwt>",
+  "refresh_token": "<opaque>",
+  "token_type": "Bearer",
+  "expires_in": 900,
+  "roles": ["customer"]
+}
+```
+
+### POST /customers/sessions/revoke
+
+- Controller: `Customers::SessionsController#revoke`
+- Auth: not required
+- Body:
+  - `refresh_token` (string, required)
+- Restrictions:
+  - Token must exist and belong to a User with `customer` role
+  - Revokes the entire token family
+- Responses:
+  - 204 No Content: token family revoked
+  - 401 Unauthorized: missing token
+  - 404 Not Found: token not found or token does not belong to a customer user
+
+### POST /customers/registrations
+
+- Controller: `Customers::RegistrationsController#create`
+- Auth: not required
+- Body:
+  - `email` (string, required)
+  - `password` (string, required)
+  - `full_name` (string, optional)
+  - `phone` (string, optional)
+- Flow:
+  - Resolve a server-managed business context (customers are not required to choose a business during signup)
+  - Create user for that business
+  - Ensure customer role exists for that business
+  - Assign customer role to the user
+  - Issue access and refresh tokens
+- Responses:
+  - 201 Created: token response plus user and roles
+  - 422 Unprocessable Entity: invalid data or duplicate email
+- Response body:
+```json
+{
+  "access_token": "<jwt>",
+  "refresh_token": "<opaque>",
+  "token_type": "Bearer",
+  "expires_in": 900,
+  "user": { "id": 1, "email": "customer@example.test", "business_id": 1 },
+  "roles": ["customer"]
+}
+```
+
+### GET /customers/me
+
+- Controller: `Customers::MeController#show`
+- Auth: required (customer user token)
+- Restrictions:
+  - Current user must have `customer` role
+- Responses:
+  - 200 OK: current customer user info and roles
+  - 401 Unauthorized: missing/invalid token or non-customer user token
+- Response body:
+```json
+{
+  "id": 1,
+  "email": "customer@example.test",
+  "full_name": "Customer One",
+  "phone": "+251911223344",
+  "business_id": 1,
+  "roles": ["customer"]
+}
+```
+
 ## Business locations
 
 ### GET /business_locations
@@ -777,10 +881,11 @@ RBAC for key management:
 - Auth: not required
 - Body:
   - `token` (string, required): tracking token from email
-  - `full_name` (string, required): customer name
-  - `phone` (string, required): customer phone
+  - `full_name` (string, required when creating a new customer): customer name
+  - `phone` (string, required when creating a new customer): customer phone
   - `email` (string, optional): customer email
-  - `dropoff` (object, required) OR `location` (object, required):
+  - `password` (string, optional): when provided together with `email`, a sign-in user can be provisioned
+  - `dropoff` (object, optional) OR `location` (object, optional):
     - `address1` (string)
     - `address2` (string, optional)
     - `city` (string)
@@ -792,11 +897,21 @@ RBAC for key management:
     - `instructions` (string, optional)
     - `name` (string, optional): for saved location (e.g., "Home", "Office")
 - Flow:
-  - Find or create customer by phone/email
+  - Resolve customer:
+    - If `email` matches an existing customer, reuse it
+    - Otherwise create a customer from `full_name`/`phone`/`email`
+  - If both `email` and `password` are present:
+    - Create or resolve a `User` for the delivery business
+    - Ensure `customer` role exists for that business
+    - Assign `customer` role to the user (idempotent)
+  - If `password` is not provided, confirmation still succeeds (legacy confirmation remains valid)
   - Create customer location (if name provided)
-  - Create dropoff stop
+  - Create dropoff stop (when `dropoff` or `location` is provided)
   - Update delivery status to `pending`
   - Create delivery event
+- Sign-in after confirmation:
+  - Customer users authenticate via existing `POST /auth/sessions` with `email` and `password`
+  - No tokens are issued by confirmation itself
 - Responses:
   - 200 OK: delivery confirmed
   - 404 Not Found: token not found

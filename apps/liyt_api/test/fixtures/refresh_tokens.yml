@@ -14,6 +14,13 @@ driver_active:
   expires_at: <%= 1.day.from_now %>
   family: driver-family
 
+customer_active:
+  token_hash: <%= Infra::TokenHashing.digest("token-customer") %>
+  owner: customer_one
+  owner_type: User
+  expires_at: <%= 1.day.from_now %>
+  family: customer-family
+
 expired:
   token_hash: <%= Infra::TokenHashing.digest("token-expired") %>
   owner: one

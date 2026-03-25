@@ -26,4 +26,24 @@ class RefreshTokenTest < ActiveSupport::TestCase
 
     assert token.revoked?
   end
+
+  test "revoke family only revokes tokens for the same owner and family" do
+    token = refresh_tokens(:active)
+    other_owner_same_family = RefreshToken.create!(
+      owner: drivers(:one),
+      token_hash: Infra::TokenHashing.digest("driver-user-family-token"),
+      expires_at: 1.day.from_now,
+      family: token.family
+    )
+
+    token.revoke_family!
+
+    assert token.reload.revoked?
+    refute other_owner_same_family.reload.revoked?
+  end
+
+  test "expired returns true when expires at is in the past" do
+    assert refresh_tokens(:expired).expired?
+    refute refresh_tokens(:active).expired?
+  end
 end

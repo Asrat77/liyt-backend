@@ -49,6 +49,13 @@ Rails.application.routes.draw do
   end
 
   namespace :customers do
+    resource :sessions, only: [ :create ] do
+      post :refresh
+      post :revoke
+    end
+    resource :registrations, only: [ :create ]
+    resource :me, only: [ :show ]
+
     get "confirmation", to: "confirmations#show"
     post "confirmation/confirm", to: "confirmations#confirm"
   end
