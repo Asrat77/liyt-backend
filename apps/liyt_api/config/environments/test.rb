@@ -53,6 +53,7 @@ Rails.application.configure do
 
   config.after_initialize do
     next unless defined?(Bullet)
+    next unless ENV["ENABLE_BULLET"] == "1"
 
     Bullet.enable = true
     Bullet.raise = true
@@ -61,5 +62,7 @@ Rails.application.configure do
     Bullet.counter_cache_enable = false
   end
 
-  config.middleware.use Bullet::Rack if defined?(Bullet)
+  if defined?(Bullet) && ENV["ENABLE_BULLET"] == "1"
+    config.middleware.use Bullet::Rack
+  end
 end

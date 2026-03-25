@@ -12,7 +12,7 @@ bundle exec brakeman -q -w2
 bundle exec bundle-audit check --update --database tmp/ruby-advisory-db
 bin/rails db:prepare
 bin/rails test
-BULLET_SERIAL_TESTS=1 bin/rails test test/integration/bullet_query_efficiency_test.rb
+ENABLE_BULLET=1 BULLET_SERIAL_TESTS=1 bin/rails test test/integration/bullet_query_efficiency_test.rb
 ```
 
 ## Auth endpoints

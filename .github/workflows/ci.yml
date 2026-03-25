@@ -14,7 +14,7 @@ jobs:
         working-directory: apps/liyt_api
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
@@ -58,7 +58,7 @@ jobs:
       DATABASE_URL: postgres://postgres:postgres@localhost:5432/liyt_api_test
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
@@ -98,9 +98,10 @@ jobs:
       RAILS_ENV: test
       DATABASE_URL: postgres://postgres:postgres@localhost:5432/liyt_api_test
       BULLET_SERIAL_TESTS: "1"
+      ENABLE_BULLET: "1"
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
