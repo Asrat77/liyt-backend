@@ -75,6 +75,33 @@ class Auth::SessionsControllerTest < ActionDispatch::IntegrationTest
     assert_response :unauthorized
   end
 
+  test "rejects malformed authorization headers for auth me" do
+    [
+      "Bearer ",
+      "Bearer",
+      "Token abc123",
+      "Bearer not-a-jwt"
+    ].each do |header|
+      get auth_me_path, headers: { "Authorization" => header }
+
+      assert_response :unauthorized
+    end
+  end
+
+  test "rejects replayed refresh token" do
+    post refresh_auth_sessions_path, params: { refresh_token: "token-active" }
+    assert_response :ok
+
+    post refresh_auth_sessions_path, params: { refresh_token: "token-active" }
+    assert_response :unauthorized
+  end
+
+  test "rejects refresh token owned by a driver" do
+    post refresh_auth_sessions_path, params: { refresh_token: "token-driver" }
+
+    assert_response :unauthorized
+  end
+
   test "customer provisioned via confirmation can sign in and refresh with customer role" do
     password = "password"
     email = "confirmed-customer@example.com"

@@ -24,6 +24,14 @@ class DeliveriesControllerTest < ActionDispatch::IntegrationTest
     assert body.is_a?(Array)
   end
 
+  test "rejects malformed authorization headers when listing deliveries" do
+    [ "Bearer ", "Bearer", "Token abc123", "Bearer invalid.jwt" ].each do |header|
+      get deliveries_path, headers: { "Authorization" => header }
+
+      assert_response :unauthorized
+    end
+  end
+
   test "uses jwt auth for non-create endpoint when x-api-key header is also present" do
     get deliveries_path,
       headers: {
@@ -238,6 +246,41 @@ class DeliveriesControllerTest < ActionDispatch::IntegrationTest
     refute_equal cross_tenant_user.business_id, body["business_id"]
   end
 
+  test "returns not found when showing a delivery from another tenant" do
+    delivery = deliveries(:awaiting_recipient)
+
+    cross_tenant_user = users(:two)
+    cross_tenant_token = Infra::Jwt.encode({
+      "sub" => cross_tenant_user.id,
+      "biz" => cross_tenant_user.business_id,
+      "typ" => "user"
+    })
+
+    get delivery_path(delivery), headers: { "Authorization" => "Bearer #{cross_tenant_token}" }
+
+    assert_response :not_found
+  end
+
+  test "returns not found when cancelling a delivery from another tenant" do
+    delivery = deliveries(:awaiting_recipient)
+
+    cross_tenant_user = users(:two)
+    admin_role = Role.create!(business: cross_tenant_user.business, name: "admin")
+    UserRole.create!(user: cross_tenant_user, role: admin_role)
+
+    cross_tenant_token = Infra::Jwt.encode({
+      "sub" => cross_tenant_user.id,
+      "biz" => cross_tenant_user.business_id,
+      "typ" => "user"
+    })
+
+    patch cancel_delivery_path(delivery),
+      headers: { "Authorization" => "Bearer #{cross_tenant_token}" },
+      params: { reason: "Not your tenant" }
+
+    assert_response :not_found
+  end
+
   test "shows a delivery" do
     delivery = deliveries(:awaiting_recipient)
     delivery.update!(business: @business)
@@ -272,6 +315,50 @@ class DeliveriesControllerTest < ActionDispatch::IntegrationTest
       params: { reason: "Customer requested" }
 
     assert_response :unprocessable_entity
+  end
+
+  test "returns unprocessable entity when an item quantity is zero" do
+    params = delivery_create_params
+    params[:items] = [ { name: "Package A", quantity: 0 } ]
+
+    assert_no_difference("Delivery.count") do
+      post deliveries_path,
+        headers: api_key_header(@active_api_key),
+        params: params
+    end
+
+    assert_response :unprocessable_entity
+  end
+
+  test "returns unprocessable entity when pickup latitude is out of range" do
+    params = delivery_create_params
+    params[:pickup][:latitude] = 91.0
+
+    assert_no_difference("Delivery.count") do
+      post deliveries_path,
+        headers: api_key_header(@active_api_key),
+        params: params
+    end
+
+    assert_response :unprocessable_entity
+  end
+
+  test "returns pickup invalid when pickup required nested fields are missing" do
+    params = delivery_create_params
+    params[:pickup] = { city: "Addis Ababa" }
+
+    assert_no_difference("Delivery.count") do
+      post deliveries_path,
+        headers: api_key_header(@active_api_key),
+        params: params
+    end
+
+    assert_response :unprocessable_entity
+    body = JSON.parse(response.body)
+
+    assert_equal "pickup_invalid", body["error"]
+    assert_includes body["missing_fields"], "address1"
+    assert_includes body["missing_fields"], "contact_name"
   end
 
   private

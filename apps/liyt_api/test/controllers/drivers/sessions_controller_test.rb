@@ -33,4 +33,18 @@ class Drivers::SessionsControllerTest < ActionDispatch::IntegrationTest
     assert refresh_tokens(:driver_active).reload.last_used_at.present?
     assert refresh_tokens(:driver_active).reload.revoked?
   end
+
+  test "rejects replayed refresh token" do
+    post refresh_drivers_sessions_path, params: { refresh_token: "token-driver" }
+    assert_response :ok
+
+    post refresh_drivers_sessions_path, params: { refresh_token: "token-driver" }
+    assert_response :unauthorized
+  end
+
+  test "rejects refresh token owned by a user" do
+    post refresh_drivers_sessions_path, params: { refresh_token: "token-active" }
+
+    assert_response :unauthorized
+  end
 end

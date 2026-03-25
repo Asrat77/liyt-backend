@@ -14,6 +14,14 @@ class Drivers::DeliveriesControllerTest < ActionDispatch::IntegrationTest
     assert body.is_a?(Array)
   end
 
+  test "rejects malformed authorization headers when listing available deliveries" do
+    [ "Bearer ", "Bearer", "Token abc123", "Bearer invalid.jwt" ].each do |header|
+      get drivers_deliveries_path, headers: { "Authorization" => header }
+
+      assert_response :unauthorized
+    end
+  end
+
   test "accepts a delivery" do
     delivery = deliveries(:pending)
 
@@ -66,5 +74,23 @@ class Drivers::DeliveriesControllerTest < ActionDispatch::IntegrationTest
       headers: { "Authorization" => "Bearer #{@token}" }
 
     assert_response :unprocessable_entity
+  end
+
+  test "forbids pickup for a delivery assigned to another driver" do
+    other_driver = Driver.create!(
+      email: "other-driver@example.com",
+      phone: "+251911000999",
+      password: "password",
+      password_confirmation: "password"
+    )
+    delivery = deliveries(:accepted)
+    delivery.update!(driver: other_driver)
+
+    patch pickup_drivers_delivery_path(delivery),
+      headers: { "Authorization" => "Bearer #{@token}" }
+
+    assert_response :forbidden
+    body = JSON.parse(response.body)
+    assert_equal "not_assigned_to_you", body["error"]
   end
 end

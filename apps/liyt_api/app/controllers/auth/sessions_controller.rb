@@ -20,6 +20,7 @@ module Auth
       token_hash = Infra::TokenHashing.digest(token)
       refresh_token = RefreshToken.find_by(token_hash: token_hash)
       return head(:unauthorized) unless refresh_token
+      return head(:unauthorized) unless refresh_token.owner_type == "User"
 
       if refresh_token.revoked? || refresh_token.expired?
         refresh_token.revoke_family!
