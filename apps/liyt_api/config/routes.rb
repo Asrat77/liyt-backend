@@ -24,6 +24,9 @@ Rails.application.routes.draw do
     resource :me, only: [ :show ]
 
     resources :deliveries, only: [ :index, :show ] do
+      collection do
+        get :history
+      end
       member do
         patch :accept
         patch :pickup

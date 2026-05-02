@@ -14,9 +14,11 @@ bin/rails db:prepare
 bin/rails test
 ENABLE_BULLET=1 BULLET_SERIAL_TESTS=1 bin/rails test test/integration/bullet_query_efficiency_test.rb
 COVERAGE=1 bin/rails test
+ruby bin/coverage_check
 ```
 
 Coverage reports are written to `apps/liyt_api/coverage/` when `COVERAGE=1` is set.
+Default coverage gates are line >= 80% and branch >= 50%. Override them locally with `MIN_LINE_COVERAGE` and `MIN_BRANCH_COVERAGE`.
 
 ## Auth endpoints
 

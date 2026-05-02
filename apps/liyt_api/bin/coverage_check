@@ -1,0 +1,36 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "json"
+
+coverage_path = File.expand_path("../coverage/.last_run.json", __dir__)
+
+unless File.exist?(coverage_path)
+  warn "Coverage results not found at #{coverage_path}. Run tests with COVERAGE=1 first."
+  exit 1
+end
+
+data = JSON.parse(File.read(coverage_path))
+result = data.fetch("result")
+
+line_coverage = result.fetch("line").to_f
+branch_coverage = result.fetch("branch").to_f
+
+line_threshold = ENV.fetch("MIN_LINE_COVERAGE", "80.0").to_f
+branch_threshold = ENV.fetch("MIN_BRANCH_COVERAGE", "50.0").to_f
+
+line_ok = line_coverage >= line_threshold
+branch_ok = branch_coverage >= branch_threshold
+
+puts format("Coverage: line=%.2f%% (min %.2f%%), branch=%.2f%% (min %.2f%%)",
+            line_coverage, line_threshold, branch_coverage, branch_threshold)
+
+if line_ok && branch_ok
+  puts "Coverage gate passed."
+  exit 0
+end
+
+warn "Coverage gate failed."
+warn format("- Line coverage below threshold: %.2f%% < %.2f%%", line_coverage, line_threshold) unless line_ok
+warn format("- Branch coverage below threshold: %.2f%% < %.2f%%", branch_coverage, branch_threshold) unless branch_ok
+exit 1

@@ -115,3 +115,51 @@ jobs:
 
       - name: Run Bullet query efficiency tests
         run: bin/rails test test/integration/bullet_query_efficiency_test.rb
+
+  coverage:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: liyt_api_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    defaults:
+      run:
+        working-directory: apps/liyt_api
+
+    env:
+      RAILS_ENV: test
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/liyt_api_test
+      COVERAGE: "1"
+      PARALLEL_WORKERS: "1"
+      MIN_LINE_COVERAGE: "80"
+      MIN_BRANCH_COVERAGE: "50"
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.4.2
+          bundler-cache: true
+          working-directory: apps/liyt_api
+
+      - name: Setup database
+        run: bin/rails db:prepare
+
+      - name: Run tests with coverage
+        run: bin/rails test
+
+      - name: Enforce coverage thresholds
+        run: ruby bin/coverage_check
