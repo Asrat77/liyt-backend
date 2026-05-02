@@ -691,6 +691,76 @@
           ]
         },
         {
+          "name": "List Driver Deliveries History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/drivers/deliveries/history",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "drivers",
+                "deliveries",
+                "history"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "delivered",
+                  "disabled": true
+                },
+                {
+                  "key": "from",
+                  "value": "2026-01-01",
+                  "disabled": true
+                },
+                {
+                  "key": "to",
+                  "value": "2026-04-30",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "per_page",
+                  "value": "20",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Driver deliveries history. Bearer required."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Body has data and meta', function () {",
+                  "  var json = pm.response.json();",
+                  "  pm.expect(json).to.have.property('data');",
+                  "  pm.expect(json).to.have.property('meta');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "Get Driver Delivery by ID",
           "request": {
             "method": "GET",
