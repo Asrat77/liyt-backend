@@ -93,4 +93,29 @@ class Drivers::DeliveriesControllerTest < ActionDispatch::IntegrationTest
     body = JSON.parse(response.body)
     assert_equal "not_assigned_to_you", body["error"]
   end
+
+  test "lists driver delivery history" do
+    get history_drivers_deliveries_path, headers: { "Authorization" => "Bearer #{@token}" }
+
+    assert_response :ok
+    body = JSON.parse(response.body)
+    assert body["data"].is_a?(Array)
+    assert body["meta"].is_a?(Hash)
+    # Ensure delivered fixture is present
+    ids = body["data"].map { |d| d["public_id"] }
+    assert_includes ids, deliveries(:delivered).public_id
+  end
+
+  test "filters history by status and paginates" do
+    # Only delivered
+    get history_drivers_deliveries_path(status: "delivered", per_page: 1, page: 1), headers: { "Authorization" => "Bearer #{@token}" }
+
+    assert_response :ok
+    body = JSON.parse(response.body)
+    assert_equal 1, body["data"].length
+    assert_equal 1, body["meta"]["per_page"]
+    assert_equal 1, body["meta"]["page"]
+    assert body["meta"]["total_count"] >= 1
+    assert_equal "delivered", body["data"].first["status"]
+  end
 end
