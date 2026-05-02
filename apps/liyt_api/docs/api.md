@@ -244,6 +244,55 @@ This document lists all routes defined in `apps/liyt_api/config/routes.rb`, with
 }
 ```
 
+### GET /drivers/deliveries/history
+
+- Controller: `Drivers::DeliveriesController#history`
+- Purpose: Return deliveries assigned to the current driver (history view). Supports filtering, ordering, and pagination.
+- Auth: required (driver token)
+- Query params:
+  - `status` — string or comma-separated list (e.g. `delivered` or `accepted,delivered`). Filters by delivery status.
+  - `q` or `search` — text search across `public_id`, customer name, email, phone.
+  - `pickup_city` — partial match on pickup city.
+  - `dropoff_city` — partial match on dropoff city.
+  - `min_price` / `max_price` — numeric filters on `price`.
+  - `from` / `to` — date range filter; see `date_field` param.
+  - `date_field` — which timestamp to apply `from`/`to` to; allowed: `delivered_at`, `created_at`, `accepted_at`. Defaults to `delivered_at`.
+  - `order_by` — allowed: `delivered_at`, `created_at`, `accepted_at`, `price`. Defaults to `delivered_at`.
+  - `order_direction` — `asc` or `desc`. Defaults to `desc`.
+  - `page` — integer, defaults to `1`.
+  - `per_page` — integer, defaults to `20`, max `100`.
+
+- Example request:
+
+```
+GET /drivers/deliveries/history?status=delivered&from=2026-01-01&to=2026-04-30&page=1&per_page=20
+Authorization: Bearer <driver_token>
+```
+
+- Response (200 OK):
+
+```json
+{
+  "data": [
+    {
+      "id": 123,
+      "public_id": "DEL004",
+      "status": "delivered",
+      "price": 250.0,
+      "description": "Completed delivery",
+      "pickup_address": { "city": "Addis Ababa", "region": "Addis Ababa" },
+      "dropoff_address": { "city": "Addis Ababa", "region": "Addis Ababa" },
+      "created_at": "2026-04-30T12:34:56Z"
+    }
+  ],
+  "meta": {
+    "page": 1,
+    "per_page": 20,
+    "total_count": 42
+  }
+}
+```
+
 ## Customers
 
 ### POST /customers/sessions
