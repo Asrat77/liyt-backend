@@ -1,7 +1,7 @@
 one:
   full_name: John Doe
   phone: "+251911111111"
-  email: john@example.com
+  email: customer@acme.test
   status: active
 
 two:

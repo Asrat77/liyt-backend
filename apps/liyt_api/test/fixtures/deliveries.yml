@@ -24,6 +24,7 @@ accepted:
 delivered:
   business: one
   driver: one
+  customer: one
   public_id: DEL004
   status: 5
   price: 250.00
