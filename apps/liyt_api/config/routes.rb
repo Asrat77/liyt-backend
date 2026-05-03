@@ -61,6 +61,12 @@ Rails.application.routes.draw do
 
     get "confirmation", to: "confirmations#show"
     post "confirmation/confirm", to: "confirmations#confirm"
+
+    resources :deliveries, only: [ :index, :show ] do
+      collection do
+        get :history
+      end
+    end
   end
 
   get "track/:token", to: "tracking#show", as: :tracking

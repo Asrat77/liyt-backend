@@ -19,6 +19,10 @@ class Delivery < ApplicationRecord
 
   # Scopes and helpers used by the drivers deliveries history endpoint
   scope :for_driver, ->(driver_id) { where(driver_id: driver_id) }
+  scope :for_customer_email, ->(email) {
+    customer_ids = Customer.where(email: email).pluck(:id)
+    where(customer_id: customer_ids)
+  }
 
   scope :with_statuses, ->(statuses) {
     return all unless statuses.present?
