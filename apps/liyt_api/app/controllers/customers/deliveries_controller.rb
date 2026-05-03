@@ -71,7 +71,7 @@ module Customers
 
     def ensure_customer_role
       return head(:unauthorized) unless Current.actor
-      head(:unauthorized) unless Current.actor.roles.where(name: "customer").exists?
+      return head(:unauthorized) unless Current.actor.roles.where(name: "customer").exists?
     end
 
     def customer_ids_for_user
